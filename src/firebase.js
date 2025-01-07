@@ -7,6 +7,8 @@ import {
   signOut,
 } from "firebase/auth";
 import { getFirestore } from "firebase/firestore"; // Import Firestore
+import { signInWithEmailAndPassword } from "firebase/auth";
+
 
 // Your web app's Firebase configuration
 const firebaseConfig = {

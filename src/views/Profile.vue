@@ -1,89 +1,100 @@
 <template>
-    <div class="profile-container">
-      <div v-if="user" class="profile-layout">
-        <!-- Left Section with Profile Info -->
-        <div class="profile-header">
-          <div class="profile-picture-section">
-            <img
-              v-if="user.photoURL"
-              :src="user.photoURL"
-              alt="Profile Picture"
-              class="profile-picture"
-            />
-            <i v-else class="fas fa-user-circle profile-icon"></i>
-            <div class="profile-info">
-              <h2 class="profile-name">{{ user.displayName || "User" }}</h2>
-              <p class="profile-email">{{ user.email }}</p>
-              <div class="subscription-status">
-                <div v-if="isSubscriptionExpired" class="status-none">
-                    No Subscription (Expired)
-                </div>
-                <div v-else-if="subscription.toLowerCase() === 'vip plan'" class="status-vip">
-                    <i class="fas fa-crown"></i> VIP Plan
-                </div>
-                <div v-else-if="subscription.toLowerCase() === 'premium plan'" class="status-premium">
-                    <i class="fas fa-gem"></i> Premium Plan
-                </div>
-                <div v-else-if="subscription.toLowerCase() === 'trial plan'" class="status-free-trial">
-                    <i class="fas fa-star"></i> Free
-                </div>
-                <div v-else class="status-none">No Subscription</div>
-                </div>
-              <button @click="openEditModal" class="btn-edit-profile">
-                <i class="fas fa-edit"></i> Edit Profile
-              </button>
+  <div class="profile-container">
+    <div v-if="user" class="profile-layout">
+      <!-- Left Section with Profile Info -->
+      <div class="profile-header">
+        <div class="profile-picture-section">
+          <img
+            v-if="user.photoURL"
+            :src="user.photoURL"
+            alt="Profile Picture"
+            class="profile-picture"
+          />
+          <i v-else class="fas fa-user-circle profile-icon"></i>
+          <div class="profile-info">
+            <h2 class="profile-name">{{ user.displayName || "User" }}</h2>
+            <p class="profile-email">{{ user.email }}</p>
+            <div class="subscription-status">
+              <div v-if="isSubscriptionExpired" class="status-none">
+                No Subscription (Expired)
+              </div>
+              <div v-else-if="subscription.toLowerCase() === 'vip plan'" class="status-vip">
+                <i class="fas fa-crown"></i> VIP Plan
+              </div>
+              <div v-else-if="subscription.toLowerCase() === 'premium plan'" class="status-premium">
+                <i class="fas fa-gem"></i> Premium Plan
+              </div>
+              <div v-else-if="subscription.toLowerCase() === 'free trial'" class="status-trial">
+                <i class="fas fa-star"></i> Free Trial
+              </div>
+              <div v-else class="status-none">No Subscription</div>
             </div>
-          </div>
-        </div>
-  
-        <!-- Main Content Section -->
-        <div class="main-content">
-          <!-- Subscription Details -->
-          <div class="subscription-details">
-            <h3>Subscription Details</h3>
-            <div class="subscription-info">
-              <p><strong>Plan:</strong> {{ subscription || 'No Subscription' }}</p>
-              <p><strong>Expiry Date:</strong> {{ formattedExpiryDate || 'N/A' }}</p>
-              <button @click="upgradeSubscription" class="btn-upgrade">
-                Upgrade Plan
-              </button>
-            </div>
+            <button @click="openEditModal" class="btn-edit-profile">
+              <i class="fas fa-edit"></i> Edit Profile
+            </button>
           </div>
         </div>
       </div>
-      <div v-else class="loading">
-        <p>Loading user data...</p>
-      </div>
-  
-      <!-- Edit Profile Modal -->
-      <div v-if="isEditModalOpen" class="modal-overlay">
-        <div class="modal-content">
-          <h2>Edit Profile</h2>
-          <!-- Alert Message -->
-          <div v-if="alertMessage" :class="['alert', alertType]">
-            {{ alertMessage }}
+
+      <!-- Main Content Section -->
+      <div class="main-content">
+        <!-- Subscription Details -->
+        <div class="subscription-details">
+          <h3>Subscription Details</h3>
+          <div class="subscription-info">
+            <p><strong>Plan:</strong> {{ subscription || 'No Subscription' }}</p>
+            <p><strong>Expiry Date:</strong> {{ formattedExpiryDate || 'N/A' }}</p>
+            <br>
+            <button @click="upgradeSubscription" class="btn-upgrade">
+              Upgrade Plan
+            </button>
           </div>
-          <form @submit.prevent="updateProfile">
-            <div class="form-group">
-              <label for="displayName">Display Name</label>
-              <input
-                type="text"
-                id="displayName"
-                v-model="editDisplayName"
-                placeholder="Enter your display name"
-                required
-              />
-            </div>
-            <div class="form-buttons">
-              <button type="submit" class="btn-save">Save Changes</button>
-              <button type="button" class="btn-cancel" @click="closeEditModal">Cancel</button>
-            </div>
-          </form>
         </div>
       </div>
     </div>
-  </template>
-  
+    <div v-else class="loading">
+      <p>Loading user data...</p>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div v-if="isEditModalOpen" class="modal-overlay">
+      <div class="modal-content">
+        <h2>Edit Profile</h2>
+        <!-- Alert Message -->
+        <div v-if="alertMessage" :class="['alert', alertType]">
+          {{ alertMessage }}
+        </div>
+        <form @submit.prevent="updateProfile">
+          <div class="form-group">
+            <label for="displayName">Display Name</label>
+            <input
+              type="text"
+              id="displayName"
+              v-model="editDisplayName"
+              placeholder="Enter your display name"
+              required
+            />
+          </div>
+          <div class="form-buttons">
+            <button type="submit" class="btn-save">Save Changes</button>
+            <button type="button" class="btn-cancel" @click="closeEditModal">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</template>
+
+
+
+
+
+
+
+
+
+
+
   <script>
   import { auth, db } from "../firebase"; // Import Firebase auth and Firestore
   import { onAuthStateChanged } from "firebase/auth";
@@ -115,8 +126,7 @@
       year: "numeric",
       month: "short",
       day: "numeric",
-      hour: "numeric",
-      minute: "numeric",
+      
     });
   },
   isSubscriptionExpired() {
@@ -426,7 +436,7 @@
   
   .status-vip,
   .status-premium,
-  .status-free-trial,
+  .status-trial,
   .status-none {
     padding: 10px;
     border-radius: 8px;
@@ -443,7 +453,7 @@
     background: linear-gradient(135deg, #4caf50, #45a049);
   }
   
-  .status-free-trial {
+  .status-trial {
     background: linear-gradient(135deg, #2196f3, #1e88e5);
   }
   

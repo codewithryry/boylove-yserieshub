@@ -6,10 +6,10 @@
         <!-- Logo and Brand Name -->
         <router-link to="/" class="navbar-brand d-flex align-items-center">
           <img
-            src="/images/boylovelogo.png"
+            src="/images/boylove.png"
             alt="Thai BL Logo"
             class="me-2"
-            style="height: 35px; width: auto;"
+            style="height: 45px; width: auto;"
           />
           <span class="fw-bold">Thai BL</span>
         </router-link>
@@ -34,7 +34,7 @@
               <router-link to="/recommendations" class="nav-link">Series</router-link>
             </li>
             <li class="nav-item">
-              <router-link to="/songs" class="nav-link">Ost</router-link>
+              <router-link to="/songs" class="nav-link">Music</router-link>
             </li>
             <li class="nav-item">
               <router-link to="/blog" class="nav-link">Blogs</router-link>
@@ -44,72 +44,85 @@
             </li>
 
             <!-- More Dropdown -->
-<li class="nav-item dropdown">
-  <a
-    class="nav-link dropdown-toggle"
-    href="#"
-    id="navbarDropdown"
-    role="button"
-    data-bs-toggle="dropdown"
-    aria-expanded="false"
-  >
-    More
-  </a>
-  <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-    <li>
-      <router-link to="/about" class="dropdown-item custom-dropdown-item">About</router-link>
-    </li>
-    <li>
-      <router-link to="/contact" class="dropdown-item custom-dropdown-item">Contact</router-link>
-    </li>
-    <li>
-      <router-link to="/feedback" class="dropdown-item custom-dropdown-item">Feedback</router-link>
-    </li>
-    <li>
-      <router-link to="/thailator-ai" class="dropdown-item custom-dropdown-item">Thai-Eng</router-link>
-    </li>
-    <li>
-      <router-link to="/faq" class="dropdown-item custom-dropdown-item">View FAQs</router-link>
-    </li>
-  </ul>
-</li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbarDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                More
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li>
+                  <router-link to="/about" class="dropdown-item custom-dropdown-item">
+                    <i class="fas fa-info-circle me-2"></i>About
+                  </router-link>
+                </li>
+                <li>
+                  <router-link to="/contact" class="dropdown-item custom-dropdown-item">
+                    <i class="fas fa-envelope me-2"></i>Contact
+                  </router-link>
+                </li>
+                <li>
+                  <router-link to="/feedback" class="dropdown-item custom-dropdown-item">
+                    <i class="fas fa-comment-dots me-2"></i>Feedback
+                  </router-link>
+                </li>
+                <li>
+                  <router-link to="/thailator-ai" class="dropdown-item custom-dropdown-item">
+                    <i class="fas fa-language me-2"></i>Thai-Eng
+                  </router-link>
+                </li>
+                <li>
+                  <router-link to="/faq" class="dropdown-item custom-dropdown-item">
+                    <i class="fas fa-question-circle me-2"></i>FAQs
+                  </router-link>
+                </li>
+              </ul>
+            </li>
 
             <!-- Login Link (Shown when user is not logged in) -->
             <li v-if="!user" class="nav-item">
               <router-link to="/login" class="nav-link">Login</router-link>
             </li>
 
-      
-      <!-- Profile Dropdown (Shown when user is logged in) -->
-<li v-else class="nav-item dropdown">
-  <a
-    class="nav-link dropdown-toggle no-arrow" 
-    href="#"
-    id="profileDropdown"
-    role="button"
-    data-bs-toggle="dropdown"
-    aria-expanded="false"
-  >
-    <!-- Display User's Profile Picture -->
-    <img
-      v-if="user.photoURL"
-      :src="user.photoURL"
-      alt="Profile Picture"
-      class="rounded-circle"
-      style="width: 30px; height: 30px; object-fit: cover;"
-    />
-    <!-- Fallback to User Icon if No Profile Picture -->
-    <i v-else class="fas fa-user"></i>
-  </a>
-  <ul class="dropdown-menu" aria-labelledby="profileDropdown">
-    <li>
-      <router-link to="/profile" class="dropdown-item">View Profile</router-link>
-    </li>
-    <li>
-      <a href="#" class="dropdown-item" @click="handleLogout">Logout</a>
-    </li>
-  </ul>
-</li>
+            <!-- Profile Dropdown (Shown when user is logged in) -->
+            <li v-else class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle no-arrow"
+                href="#"
+                id="profileDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <!-- Display User's Profile Picture -->
+                <img
+                  v-if="user.photoURL"
+                  :src="user.photoURL"
+                  alt="Profile Picture"
+                  class="rounded-circle"
+                  style="width: 30px; height: 30px; object-fit: cover;"
+                />
+                <!-- Fallback to User Icon if No Profile Picture -->
+                <i v-else class="fas fa-user"></i>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                <li>
+                  <router-link to="/profile" class="dropdown-item">
+                    <i class="fas fa-user-circle me-2"></i>Profile
+                  </router-link>
+                </li>
+                <li>
+                  <a href="#" class="dropdown-item" @click="handleLogout">
+                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                  </a>
+                </li>
+              </ul>
+            </li>
           </ul>
         </div>
       </div>
@@ -122,28 +135,78 @@
         <i class="fas fa-times"></i>
       </button>
       <br>
+      <br>
       <ul class="sidebar-nav">
         <!-- Sidebar Links -->
         <li class="sidebar-item">
-          <router-link to="/" class="sidebar-link" @click="closeSidebar">Home</router-link>
+          <router-link to="/" class="sidebar-link" @click="closeSidebar">
+            <i class="fas fa-home me-2"></i>Home
+          </router-link>
         </li>
         <li class="sidebar-item">
-          <router-link to="/recommendations" class="sidebar-link" @click="closeSidebar">Series</router-link>
+          <router-link to="/recommendations" class="sidebar-link" @click="closeSidebar">
+            <i class="fas fa-tv me-2"></i>Series
+          </router-link>
         </li>
         <li class="sidebar-item">
-          <router-link to="/blog" class="sidebar-link" @click="closeSidebar">Blogs</router-link>
+          <router-link to="/songs" class="sidebar-link" @click="closeSidebar">
+            <i class="fas fa-music me-2"></i>Music
+          </router-link>
+        </li>
+        <li class="sidebar-item">
+          <router-link to="/blog" class="sidebar-link" @click="closeSidebar">
+            <i class="fas fa-blog me-2"></i>Blogs
+          </router-link>
         </li>
   
+        <br>
+        <li class="sidebar-item">
+          <router-link to="/pricing" class="sidebar-link" @click="closeSidebar">
+            <i class="fas fa-dollar-sign me-2"></i>Subscription 
+          </router-link>
+        </li>
+
+        <br>
+
+        <!-- More Dropdown Items -->
+        <li class="sidebar-item">
+          <router-link to="/about" class="sidebar-link" @click="closeSidebar">
+            <i class="fas fa-info-circle me-2"></i>About
+          </router-link>
+        </li>
+        <li class="sidebar-item">
+          <router-link to="/feedback" class="sidebar-link" @click="closeSidebar">
+            <i class="fas fa-comment-dots me-2"></i>Feedback
+          </router-link>
+        </li>
+        <li class="sidebar-item">
+          <router-link to="/faq" class="sidebar-link" @click="closeSidebar">
+            <i class="fas fa-question-circle me-2"></i>FAQs
+          </router-link>
+        </li>
+        <br>
+        <br>
+        <br>
+
         <!-- Profile Links in Sidebar (Shown when user is logged in) -->
         <template v-if="user">
           <li class="sidebar-item">
-            <a href="#" class="sidebar-link" @click="handleLogout">Logout</a>
+            <router-link to="/profile" class="sidebar-link" @click="closeSidebar">
+              <i class="fas fa-user-circle me-2"></i>Profile
+            </router-link>
+          </li>
+          <li class="sidebar-item">
+            <a href="#" class="sidebar-link" @click="handleLogout">
+              <i class="fas fa-sign-out-alt me-2"></i>Logout
+            </a>
           </li>
         </template>
 
         <!-- Login Link in Sidebar (Shown when user is not logged in) -->
         <li v-else class="sidebar-item">
-          <router-link to="/login" class="sidebar-link" @click="closeSidebar">Login</router-link>
+          <router-link to="/login" class="sidebar-link" @click="closeSidebar">
+            <i class="fas fa-sign-in-alt me-2"></i>Login
+          </router-link>
         </li>
       </ul>
     </div>
@@ -159,6 +222,17 @@
     </footer>
   </div>
 </template>
+
+
+
+
+
+
+
+
+
+
+
 
 
 <script>
@@ -275,7 +349,7 @@ export default {
   position: fixed;
   top: 0;
   right: -280px; /* Hide sidebar by default on the right */
-  width: 280px;
+  width: 160px;
   height: 100vh;
   background-color: #ffffff;
   box-shadow: -4px 0 16px rgba(0, 0, 0, 0.1); /* Shadow on the left side */
@@ -284,7 +358,7 @@ export default {
 }
 
 .sidebar.show {
-  right: 0; /* Show sidebar when toggled */
+  right: 0; /* Show sidebar by moving it to the right */
 }
 
 .sidebar-overlay {
@@ -296,48 +370,46 @@ export default {
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 999;
   display: none;
-  transition: all 0.3s ease;
 }
 
 .sidebar-overlay.show {
-  display: block; /* Show overlay when sidebar is open */
+  display: block;
 }
 
 .sidebar-close {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  background: transparent;
+  top: 10px;
+  left: 10px; /* Move close button to the left */
+  background: none;
   border: none;
-  font-size: 1.5rem;
   color: #000000;
-  cursor: pointer;
+  font-size: 1.5rem;
 }
 
 .sidebar-nav {
   list-style: none;
-  padding: 20px;
+  padding: 0;
   margin: 0;
-
 }
 
 .sidebar-item {
-  margin: 15px 0;
+  padding: 10px 15px;
+  text-align: left; /* Ensure text is aligned to the left */
 }
 
 .sidebar-link {
-  color: #000000;
+  color: rgba(0, 0, 0, 0.8);
   text-decoration: none;
-  font-weight: 600;
-  padding: 10px 15px;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  display: block;
+  display: flex;
+  align-items: center;
+  padding-left: 0; /* Ensure no padding on the left */
 }
 
 .sidebar-link:hover {
-  background-color: #ffffff;
-  color: #000000;
-  transform: translateX(5px);
+  color: rgb(0, 0, 0);
+}
+
+.sidebar-link i {
+  margin-right: 10px;
 }
 </style>

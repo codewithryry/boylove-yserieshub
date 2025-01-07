@@ -109,7 +109,7 @@ export default {
         {
           id: 5,
           title: "Fish upon the Sky",
-          image: "/images/fish.jpg",
+          image: "/images/Fish-upon-the-Sky.jpg",
           shortDescription: "A lighthearted story of love and self-discovery.",
           synopsis: "Pi, a college student, navigates love and friendship while trying to win the heart of his crush, Mork.",
           cast: [

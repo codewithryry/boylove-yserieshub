@@ -64,7 +64,7 @@ export default {
         trial: {
           title: 'Free',
           description: 'Limited access to series and exclusive features.',
-          price: '$0.00/day',
+          price: '$0.00/month',
           features: [
           'Unlock access to series',
           'Exclusive content for Watch Party ',

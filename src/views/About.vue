@@ -61,14 +61,7 @@
               </p>
   
               <br>
-              <div class="text-center mt-4 animate__animated animate__fadeInUp animate__delay-7s">
-                <a href="https://github.com/codewithryry/thaiblweb-using-vue.js.git" target="_blank" class="btn btn-primary btn-lg me-3">
-                  <i class="fab fa-github"></i> View on GitHub
-                </a>
-                <a href="https://chat.deepseek.com/" target="_blank" class="btn btn-success btn-lg">
-                  <i class="fas fa-robot"></i> DeepSeek Chat
-                </a>
-              </div>
+             
             </section>
           </div>
         </div>

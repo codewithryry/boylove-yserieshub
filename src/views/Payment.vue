@@ -103,7 +103,7 @@ export default {
         trial: {
           title: 'Free Trial',
           description: 'Enjoy full access to all features.',
-          price: '$0.00/day',
+          price: '$0.00/month',
           features: [
             'Unlock access to series',
             'Exclusive content for Watch Party',
@@ -146,69 +146,71 @@ export default {
 
     // Process the payment
     async processPayment() {
-      if (!this.userId) {
-        alert("You must be logged in to complete the payment.");
-        return;
-      }
+  if (!this.userId) {
+    alert("You must be logged in to complete the payment.");
+    return;
+  }
 
-      try {
-        const db = getFirestore();
+  try {
+    const db = getFirestore();
 
-        // Get the current timestamp
-        const createdAt = serverTimestamp();
+    // Get the current timestamp
+    const createdAt = serverTimestamp();
 
-        // Calculate the expiry date based on the plan
-        const expiryDate = new Date(); // JavaScript Date object
-        if (this.planDetails.title.toLowerCase() === 'trial plan') {
-          expiryDate.setDate(expiryDate.getDate() + 1); // 1 day for trial plan
-        } else {
-          expiryDate.setDate(expiryDate.getDate() + 29); // 29 days for other plans
-        }
+    // Calculate the expiry date based on the plan
+    const expiryDate = new Date(); // JavaScript Date object
+    expiryDate.setDate(expiryDate.getDate() + 30); // 30 days for all plans
+    
+    // Generate a random 16-digit Transaction ID
+    const transactionId = this.generateTransactionId();
 
-        // Generate a random 16-digit Transaction ID
-        const transactionId = this.generateTransactionId();
+    // Save payment details to Firestore
+    const paymentsRef = collection(db, "payments");
+    await addDoc(paymentsRef, {
+      plan: this.planDetails.title,
+      price: this.planDetails.price,
+      userId: this.userId,
+      createdAt: createdAt,
+      expiryDate: expiryDate, // Save as JavaScript Date object
+      transactionId: transactionId, // Save the Transaction ID
+    });
 
-        // Save payment details to Firestore
-        const paymentsRef = collection(db, "payments");
-        await addDoc(paymentsRef, {
-          plan: this.planDetails.title,
-          price: this.planDetails.price,
-          userId: this.userId,
-          createdAt: createdAt,
-          expiryDate: expiryDate, // Save as JavaScript Date object
-          transactionId: transactionId, // Save the Transaction ID
-        });
+    // Update the user's subscription in the 'users' collection
+    const userDocRef = doc(db, "users", this.userId);
+    await updateDoc(userDocRef, {
+      subscription: this.planDetails.title.toLowerCase(),
+      createdAt: createdAt,
+      expiryDate: expiryDate, // Save as JavaScript Date object
+    });
 
-        // Update the user's subscription in the 'users' collection
-        const userDocRef = doc(db, "users", this.userId);
-        await updateDoc(userDocRef, {
-          subscription: this.planDetails.title.toLowerCase(),
-          createdAt: createdAt,
-          expiryDate: expiryDate, // Save as JavaScript Date object
-        });
+    // Save receipt details to the 'receipts' collection
+    const receiptsRef = collection(db, "receipts");
+    await addDoc(receiptsRef, {
+      userId: this.userId,
+      plan: this.planDetails.title,
+      price: this.planDetails.price,
+      features: this.planDetails.features,
+      expiryDate: expiryDate,
+      createdAt: createdAt,
+      transactionId: transactionId, // Save the Transaction ID
+    });
 
-        // Save receipt details to the 'receipts' collection
-        const receiptsRef = collection(db, "receipts");
-        await addDoc(receiptsRef, {
-          userId: this.userId,
-          plan: this.planDetails.title,
-          price: this.planDetails.price,
-          features: this.planDetails.features,
-          expiryDate: expiryDate,
-          createdAt: createdAt,
-          transactionId: transactionId, // Save the Transaction ID
-        });
+    // Store expiry date and transaction ID in component data for the receipt
+    this.expiryDate = expiryDate; // Already a Date object
+    this.transactionId = transactionId; // Store the Transaction ID
 
-        // Store expiry date and transaction ID in component data for the receipt
-        this.expiryDate = expiryDate; // Already a Date object
-        this.transactionId = transactionId; // Store the Transaction ID
+    this.showModal = true; // Show the modal
 
-        this.showModal = true; // Show the modal
-      } catch (error) {
-        console.error("Error processing payment:", error);
-        alert("Failed to process payment. Please try again.");
-      }
-    },
+    // Redirect to the homepage after 3 seconds
+    setTimeout(() => {
+      this.$router.push('/'); // Redirect to home
+    }, 3000); // 3 seconds delay for user to see the success modal
+
+  } catch (error) {
+    console.error("Error processing payment:", error);
+    alert("Failed to process payment. Please try again.");
+  }
+},
 
     // Close the modal
     closeModal() {

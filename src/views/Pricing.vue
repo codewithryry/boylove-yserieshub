@@ -10,8 +10,8 @@
           <div class="card h-100 shadow">
             <div class="card-body">
               <h5 class="card-title fw-bold">Trial Plan</h5>
-              <p class="card-text text-muted">Enjoy full access to all features for a day. Credit card required.</p>
-              <p class="card-text"><strong>Price:</strong> $0.00/day</p>
+              <p class="card-text text-muted">Enjoy access  for a month. Credit card required.</p>
+              <p class="card-text"><strong>Price:</strong> $0.00/month</p>
               <router-link 
                 :to="{ path: '/get-started', query: { subscription: 'trial' } }" 
                 class="btn btn-primary"

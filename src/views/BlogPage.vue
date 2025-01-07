@@ -154,7 +154,7 @@ export default {
     author: 'The BL Xpress',
     date: '2024-11-27',
     excerpt: 'The highly anticipated second season of "Pit Babe" is set to release in 2025, with Pavel Naret and Pooh Krittin reprising their roles. Fans can expect more drama, romance, and high-speed action in this sequel.',
-    image: 'images/pit.jpg',
+    image: 'images/pit-babes2.jpg',
     content: 'The highly anticipated second season of "Pit Babe" is set to release in 2025, with Pavel Naret and Pooh Krittin reprising their roles. Fans can expect more drama, romance, and high-speed action in this sequel. The first season left viewers on the edge of their seats, and the second season promises to deliver even more thrilling moments.',
     url: 'https://theblxpress.wordpress.com/2024/11/27/gmmtv-lineup-2025-riding-the-wave/',
     vipOnly: true, // VIP-only content
