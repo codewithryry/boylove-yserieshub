@@ -1,7 +1,7 @@
 <template>
   <div class="discussion">
-    <h1 class="discussion-title"> User Feedback</h1>
-    <p class="discussion-subtitle">We value your feedback! Share your thoughts and suggestions to help us improve.</p>
+    <h1 class="discussion-title">User Feedback</h1>
+    <p class="discussion-subtitle">Share your thoughts and suggestions to help us improve.</p>
 
     <!-- Discussion Form -->
     <div class="discussion-form">
@@ -11,33 +11,23 @@
         rows="4"
         class="form-control"
         :disabled="isPosting"
+        maxlength="500"
       ></textarea>
-      <button @click="postComment" class="btn btn-post mt-3" :disabled="isPosting || !newComment.trim()">
+      <small class="char-counter">{{ newComment.length }}/500</small>
+      <button @click="handlePostClick" class="btn btn-post mt-3" :disabled="isPosting || !newComment.trim()">
         {{ isPosting ? 'Posting...' : 'Post Comment' }}
       </button>
       <small v-if="errorMessage" class="error-message">{{ errorMessage }}</small>
     </div>
 
-    <!-- Comments List -->
-    <div class="comments mt-5">
-      <h2 class="comments-title">Recent Feedback</h2>
-      <div v-if="isLoading" class="loading-spinner">
-        Loading feedback...
-      </div>
-      <div v-else>
-        <div v-if="comments.length === 0" class="no-comments">
-          No feedback yet. Be the first to share your thoughts!
-        </div>
-        <div v-else>
-          <div
-            v-for="(comment, index) in comments"
-            :key="comment.id"
-            class="comment-card animate__animated animate__fadeInUp"
-          >
-            <p class="comment-text">{{ comment.text }}</p>
-            <small class="comment-author">Posted by: {{ comment.author || 'Anonymous' }}</small>
-            <small class="comment-timestamp">{{ formatTimestamp(comment.timestamp) }}</small>
-          </div>
+    <!-- Login Modal -->
+    <div v-if="showLoginModal" class="modal-overlay">
+      <div class="modal-content">
+        <h3>Login Required</h3>
+        <p>You must be logged in to post feedback.</p>
+        <div class="modal-actions">
+          <button @click="redirectToLogin" class="btn btn-confirm">Log In</button>
+          <button @click="showLoginModal = false" class="btn btn-cancel">Cancel</button>
         </div>
       </div>
     </div>
@@ -54,17 +44,13 @@ export default {
   data() {
     return {
       newComment: '', // Stores the new comment text
-      comments: [], // Comments will be loaded dynamically
       isPosting: false, // Loading state for posting
-      isLoading: false, // Loading state for fetching comments
       errorMessage: '', // Error message for user feedback
       user: null, // Logged-in user
+      showLoginModal: false, // Control login modal visibility
     };
   },
   async created() {
-    // Fetch comments when the component is created
-    await this.fetchComments();
-
     // Listen for authentication state changes
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -75,33 +61,16 @@ export default {
     });
   },
   methods: {
-    async fetchComments() {
-      this.isLoading = true;
-      try {
-        // Fetch comments from Firestore
-        const commentsRef = collection(db, "comments");
-        const q = query(commentsRef, orderBy("timestamp", "desc")); // Sort by timestamp
-        const querySnapshot = await getDocs(q);
-
-        this.comments = querySnapshot.docs.map((doc) => ({
-          id: doc.id, // Include the document ID
-          ...doc.data(),
-        }));
-      } catch (error) {
-        this.errorMessage = 'Failed to load comments. Please try again later.';
-        console.error("Error fetching comments:", error);
-      } finally {
-        this.isLoading = false;
+    handlePostClick() {
+      if (!this.user) {
+        this.showLoginModal = true; // Show login modal if user is not logged in
+        return;
       }
+      this.postComment(); // Proceed to post if user is logged in
     },
     async postComment() {
       if (this.newComment.trim() === '') {
         this.errorMessage = 'Please write a comment before posting.';
-        return;
-      }
-
-      if (!this.user) {
-        this.errorMessage = 'You must be logged in to post a comment.';
         return;
       }
 
@@ -119,30 +88,16 @@ export default {
 
         // Clear the input field
         this.newComment = '';
-
-        // Refresh the comments list
-        await this.fetchComments();
       } catch (error) {
-        this.errorMessage = 'Failed to post your comment. Please try again.';
-        console.error("Error posting comment:", error);
+        this.errorMessage = 'Failed to post your feedback. Please try again.';
+        console.error("Error posting feedback:", error);
       } finally {
         this.isPosting = false;
       }
     },
-    formatTimestamp(timestamp) {
-      if (!timestamp) return "Just now"; // Fallback if timestamp is missing
-
-      // Convert Firestore timestamp to a JavaScript Date object
-      const date = timestamp.toDate();
-
-      // Format the date and time
-      return date.toLocaleString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "numeric",
-        minute: "numeric",
-      });
+    redirectToLogin() {
+      // Redirect to your login page or open a login modal
+      this.$router.push('/login'); // Example: Redirect to login route
     },
   },
 };
@@ -165,13 +120,15 @@ export default {
   font-size: 3rem;
   font-weight: 700;
   color: #2c3e50;
-  margin-bottom: 10px;
+  margin-bottom: 17px;
+  animation: fadeInDown 1s ease;
 }
 
 .discussion-subtitle {
   font-size: 1.25rem;
   color: #555;
   margin-bottom: 30px;
+  animation: fadeInUp 1s ease;
 }
 
 .discussion-form {
@@ -182,21 +139,37 @@ export default {
   border-radius: 15px;
   backdrop-filter: blur(10px);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 1.5s ease;
 }
 
 .form-control {
   width: 100%;
   padding: 10px;
-  border: 1px solid #ddd;
+  border: 1px solid rgba(221, 221, 221, 0.5);
   border-radius: 8px;
   font-size: 1rem;
   font-family: 'Poppins', sans-serif;
   resize: vertical;
   background: rgba(255, 255, 255, 0.9); /* Glassmorphism effect */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #2c3e50;
+  box-shadow: 0 0 8px rgba(44, 62, 80, 0.2);
+  outline: none;
+}
+
+.char-counter {
+  display: block;
+  text-align: right;
+  font-size: 0.875rem;
+  color: #777;
+  margin-top: 5px;
 }
 
 .btn-post {
-  background: linear-gradient(135deg, #2c3e50, #1a252f);
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
   border: none;
   color: #fff;
   padding: 10px 20px;
@@ -207,8 +180,9 @@ export default {
 }
 
 .btn-post:hover:not(:disabled) {
-  background: linear-gradient(135deg, #1a252f, #2c3e50);
+  background: linear-gradient(135deg, #2575fc, #6a11cb);
   transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .btn-post:disabled {
@@ -223,66 +197,95 @@ export default {
   display: block;
 }
 
-.comments {
-  max-width: 800px;
-  margin: 0 auto;
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
   padding: 20px;
-}
-
-.comments-title {
-  font-size: 2rem;
-  font-weight: 600;
-  color: #2c3e50;
-  margin-bottom: 20px;
-}
-
-.no-comments {
-  font-size: 1rem;
-  color: #777;
-  font-style: italic;
-}
-
-.comment-card {
-  background: rgba(255, 255, 255, 0.8); /* Glassmorphism effect */
-  border: 1px solid rgba(221, 221, 221, 0.5);
   border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 15px;
-  text-align: left;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
 }
 
-.comment-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
 }
 
-.comment-text {
-  font-size: 1rem;
+.btn-confirm {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-confirm:hover {
+  background: linear-gradient(135deg, #2575fc, #6a11cb);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-cancel {
+  background: #ccc;
   color: #333;
-  margin-bottom: 10px;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-.comment-author {
-  font-size: 0.875rem;
-  color: #777;
-  display: block;
-  margin-top: 5px;
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.comment-timestamp {
-  font-size: 0.75rem;
-  color: #999;
-  display: block;
-  margin-top: 5px;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
-.loading-spinner {
-  font-size: 1rem;
-  color: #777;
-  font-style: italic;
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Responsive Design */
@@ -293,10 +296,6 @@ export default {
 
   .discussion-subtitle {
     font-size: 1.1rem;
-  }
-
-  .comments-title {
-    font-size: 1.75rem;
   }
 }
 </style>

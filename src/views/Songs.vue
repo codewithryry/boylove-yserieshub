@@ -121,6 +121,7 @@
   <script>
   import { auth, db } from '../firebase'; // Import Firebase auth and Firestore
   import { doc, getDoc } from 'firebase/firestore';
+  import songsData from '@/assets/songs.json'; // Import the JSON file
   
   export default {
     name: 'Songs',
@@ -128,129 +129,9 @@
       return {
         searchQuery: '',
         visibleSongsCount: 6,
-        userIsPremium: false, // Initialize as false
-        userIsVIP: false, // Initialize as false
-        songs: [
-          {
-            title: 'TharnType The Series - อาบน้ำร้อนมาก่อน',
-            artist: 'Toptap Jirakit',
-            src: '/songs/tharntype.mp3',
-            youtubeId: 'GErIL_x2ucw',
-            playCount: 1234,
-            likes: 56,
-            liked: false,
-            premium: false, // Free access
-          },
-          {
-            title: 'LOVE IS EVERYWHERE OST. FOUREVER YOU',
-            artist: 'Boy Sompob',
-            src: '/songs/love-is-everywhere.mp3',
-            youtubeId: 'ezFpjYrBo3c',
-            playCount: 987,
-            likes: 34,
-            liked: false,
-            premium: true, // Premium access
-          },
-          {
-            title: '2gether: The Series - Tit Gub',
-            artist: 'Bright Vachirawit',
-            src: '/songs/tit-gub.mp3',
-            youtubeId: 'dQaI3VkSCi0',
-            playCount: 4567,
-            likes: 120,
-            liked: false,
-            premium: true, // Premium access
-          },
-          {
-            title: 'SOTUS: The Series - ขอให้โชคดี',
-            artist: 'Getsunova',
-            src: '/songs/sotus.mp3',
-            youtubeId: 'zWBpVWuMBQE',
-            playCount: 3456,
-            likes: 89,
-            liked: false,
-            premium: true, // Premium access
-          },
-          {
-            title: 'Dark Blue Kiss - ไม่ปล่อยมือ',
-            artist: 'Boy Sompob',
-            src: '/songs/dark-blue-kiss.mp3',
-            youtubeId: 'b9T6hF0WoAc',
-            playCount: 2345,
-            likes: 78,
-            liked: false,
-            premium: true, // Premium access
-          },
-          {
-            title: 'Theory of Love - แค่ไหนก็ใกล้',
-            artist: 'Getsunova',
-            src: '/songs/theory-of-love.mp3',
-            youtubeId: 'sJwCwbk3YVw',
-            playCount: 5678,
-            likes: 150,
-            liked: false,
-            premium: true, // Premium access
-          },
-          {
-            title: 'I Told Sunset About You - Skyline',
-            artist: 'Billkin',
-            src: '/songs/skyline.mp3',
-            youtubeId: 'hJeEOzEZstU',
-            playCount: 6789,
-            likes: 200,
-            premium: true, // Premium access
-          },
-          {
-            title: 'I Promised You The Moon - แค่เธอ',
-            artist: 'Billkin',
-            src: '/songs/kae-ther.mp3',
-            youtubeId: 'zbvSieQdNpY',
-            playCount: 7890,
-            likes: 250,
-            liked: false,
-            premium: true, // Premium access
-          },
-          {
-            title: 'A Tale of Thousand Stars - 1000stars',
-            artist: 'Gun Napat',
-            src: '/songs/1000stars.mp3',
-            youtubeId: 'O-QWKCcbRFg',
-            playCount: 8901,
-            likes: 300,
-            liked: false,
-            premium: true, // Premium access
-          },
-          {
-            title: 'Bad Buddy - เพลงรัก',
-            artist: 'Nanon Korapat',
-            src: '/songs/bad-buddy.mp3',
-            youtubeId: 'bGsQLF2b3y4',
-            playCount: 9012,
-            likes: 350,
-            liked: false,
-            premium: true, // Premium access
-          },
-          {
-            title: 'Not Me - ไม่มีนิยาม',
-            artist: 'Khaotung Thanawat',
-            src: '/songs/not-me.mp3',
-            youtubeId: 'd5rGW310K-I',
-            playCount: 10123,
-            likes: 400,
-            liked: false,
-            premium: true, // Premium access
-          },
-          {
-            title: 'KinnPorsche - เพลงรัก',
-            artist: 'Karinyawat (Foet) Durongjirakan',
-            src: '/songs/kinnporsche.mp3',
-            youtubeId: 'kmyysYijJ2Y',
-            playCount: 11234,
-            likes: 450,
-            liked: false,
-            premium: true, // Premium access
-          },
-        ],
+        userIsPremium: false,
+        userIsVIP: false,
+        songs: songsData, // Use the imported JSON data
         dynamicBackground: {
           background: 'linear-gradient(135deg, #f8f9fa, #e9ecef)',
         },
@@ -258,71 +139,65 @@
       };
     },
     computed: {
-    filteredSongs() {
-      return this.songs.filter((song) =>
-        song.title.toLowerCase().includes(this.searchQuery.toLowerCase())
-      );
+      filteredSongs() {
+        return this.songs.filter((song) =>
+          song.title.toLowerCase().includes(this.searchQuery.toLowerCase())
+        );
+      },
+      visibleSongs() {
+        return this.filteredSongs.slice(0, this.visibleSongsCount);
+      },
+      featuredSongs() {
+        return this.songs.filter((song) => song.featured).slice(0, 3);
+      },
+      userHasAccess() {
+        return this.userIsPremium || this.userIsVIP;
+      },
     },
-    visibleSongs() {
-      return this.filteredSongs.slice(0, this.visibleSongsCount);
-    },
-    featuredSongs() {
-      return this.songs.filter((song) => song.featured).slice(0, 3);
-    },
-    userHasAccess() {
-      return this.userIsPremium || this.userIsVIP; // Allow access for Premium or VIP users
-    },
-  },
-  methods: {
-    async checkUserSubscription() {
-      const user = auth.currentUser;
-      if (user) {
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          // Check for both Premium and VIP plans
-          this.userIsPremium = userData.subscription === 'premium plan';
-          this.userIsVIP = userData.subscription === 'vip plan';
+    methods: {
+      async checkUserSubscription() {
+        const user = auth.currentUser;
+        if (user) {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            this.userIsPremium = userData.subscription === 'premium plan';
+            this.userIsVIP = userData.subscription === 'vip plan';
+          }
         }
-      }
+      },
+      upgradeToPremium() {
+        this.$router.push({ path: '/get-started', query: { subscription: 'premium' } });
+      },
+      toggleLike(song) {
+        song.liked = !song.liked;
+        song.likes += song.liked ? 1 : -1;
+      },
+      shareSong(song) {
+        const url = `https://www.youtube.com/watch?v=${song.youtubeId}`;
+        navigator.clipboard.writeText(url).then(() => {
+          alert('Link copied to clipboard!');
+        });
+      },
+      loadMore() {
+        this.visibleSongsCount += 6;
+      },
+      setDynamicBackground(color) {
+        this.dynamicBackground.background = `linear-gradient(135deg, ${color}, #e9ecef)`;
+      },
+      handleScroll() {
+        this.showBackToTop = window.scrollY > 300;
+      },
     },
-    upgradeToPremium() {
-      // Redirect to the subscription page
-      this.$router.push({ path: '/get-started', query: { subscription: 'premium' } });
+    mounted() {
+      this.checkUserSubscription();
+      window.addEventListener('scroll', this.handleScroll);
     },
-    toggleLike(song) {
-      song.liked = !song.liked;
-      song.likes += song.liked ? 1 : -1;
+    beforeDestroy() {
+      window.removeEventListener('scroll', this.handleScroll);
     },
-    shareSong(song) {
-      const url = `https://www.youtube.com/watch?v=${song.youtubeId}`;
-      navigator.clipboard.writeText(url).then(() => {
-        alert('Link copied to clipboard!');
-      });
-    },
-    loadMore() {
-      this.visibleSongsCount += 6;
-    },
-    setDynamicBackground(color) {
-      this.dynamicBackground.background = `linear-gradient(135deg, ${color}, #e9ecef)`;
-    },
-    handleScroll() {
-      this.showBackToTop = window.scrollY > 300;
-    },
-  },
-  mounted() {
-    this.checkUserSubscription(); // Fetch the user's subscription status
-    window.addEventListener('scroll', this.handleScroll);
-  },
-  beforeDestroy() {
-    window.removeEventListener('scroll', this.handleScroll);
-  },
-};
-</script>
-
-
-
-
+  };
+  </script>
 
 
 
@@ -602,7 +477,8 @@
   
   .btn-load-more {
     padding: 10px 20px;
-    background-color: #2c3e50;
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    border: none;
     color: #fff;
     border: none;
     border-radius: 8px;
@@ -619,7 +495,8 @@
     bottom: 20px;
     right: 20px;
     padding: 10px;
-    background-color: #2c3e50;
+     background: linear-gradient(135deg, #6a11cb, #2575fc);
+  border: none;
     color: #fff;
     border: none;
     border-radius: 50%;

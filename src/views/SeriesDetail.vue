@@ -49,6 +49,7 @@
           </div>
         </div>
       </div>
+      
   
       <div v-else class="not-found">
         <div class="content">
@@ -58,178 +59,115 @@
             The series you're looking for doesn't exist or has been moved.
           </p>
           <router-link to="/recommendations" class="home-link">
-            <i class="fas fa-arrow-left"></i> Back to Series
+            <i class=""></i> Back to Series
           </router-link>
         </div>
       </div>
+
+        <!-- Scroll to Top Button -->
+    <button v-if="showScrollToTop" @click="scrollToTop" class="scroll-to-top">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+
     </div>
   </template>
-  
-  <script>
-  export default {
-    name: 'SeriesDetail',
-    props: ['id'],
-    data() {
-      return {
-        series: {},
-      };
-    },
-    created() {
-  this.fetchSeriesDetail();
-  this.checkUserPlan();
-},
-methods: {
-  fetchSeriesDetail() {
-    const seriesList = [
-          {
-            id: 1,
-            title: "Bad Buddy",
-            image: "/images/bad-buddy.jpg",
-            shortDescription: "A story of rivalry turned friendship and love.",
-            synopsis: "Ever since they were young, Pran and Pat's families feuded, leaving no stone unturned to outshine the other. As expected of them, the two boys also became rivals - until they grew tired and became friends. But are they only friends?",
-            releaseDate: "October 29, 2021",
-            genre: ["Romance", "Comedy", "Drama"],
-            trailer: "https://www.youtube.com/embed/_F_9KRrmkqo",
-            fullplaylist: "https://www.youtube.com/playlist?list=PLYYyUhZKiEj5_rzfoSNCcJQgtao9GIQFX",
-          },
-          {
-            id: 2,
-            title: "2gether: The Series",
-            image: "/images/2gether.jpg",
-            shortDescription: "A fake relationship turns into something real.",
-            synopsis: "Tine is a popular college student who is pursued by a persistent admirer. To get rid of him, Tine enlists the help of Sarawat, a cool and aloof musician, to pretend to be his boyfriend.",
-            releaseDate: "February 21, 2020",
-            genre: ["Romance", "Comedy", "School"],
-            trailer: "https://www.youtube.com/embed/6OQl08Weel4",
-            fullplaylist: "https://www.youtube.com/playlist?list=PLVt9mZLtnOAkAwx2qr9vwNxVPXymoLfnY",
-          },
-          {
-            id: 3,
-            title: "TharnType: The Series",
-            image: "/images/tharntype.jpg",
-            shortDescription: "A story of love and acceptance between two very different men.",
-            synopsis: "Tharn, a gay man, and Type, a homophobic man, end up as roommates. Despite their differences, they develop a deep connection and learn to accept each other.",
-            releaseDate: "November 7, 2019",
-            genre: ["Romance", "Drama", "LGBTQ+"],
-            trailer: "https://www.youtube.com/embed/2sEJnOQFa2Q",
-            fullplaylist: "https://youtube.com/playlist?list=PL5P0-hGbCM_4AG-XG9VzLpWz0XT_WTUl8",
-          },
-          {
-            
-  id: 4,
-  title: "My School President",
-  image: "/images/myschoolpresident.jpg",
-  shortDescription: "A heartwarming tale of leadership, friendship, and young love.",
-  synopsis: "Tinn, a diligent and responsible student, is elected as the school president. As he navigates the challenges of his new role, he forms an unexpected bond with Gun, a carefree and popular classmate. Together, they tackle school issues, organize events, and discover the true meaning of teamwork and love. Along the way, they learn valuable lessons about responsibility, friendship, and following their hearts.",
-  releaseDate: "December 2, 2022",
-  genre: ["Romance", "Drama", "Youth", "School Life"],
 
-            trailer: "https://www.youtube.com/watch?v=5MfQ9Npm2-w",
-            fullplaylist: "https://youtube.com/playlist?list=PLYYyUhZKiEj6dHwmZAAUuD3jbA9Kmc02B",
-          },
-          {
-            id: 5,
-            title: "Fish upon the Sky",
-            image: "/images/fish-upon-the-sky.jpg",
-            shortDescription: "A lighthearted story of love and self-discovery.",
-            synopsis: "Pi, a college student, navigates love and friendship while trying to win the heart of his crush, Mork.",
-            releaseDate: "April 9, 2021",
-            genre: ["Romance", "Comedy", "LGBTQ+"],
-            trailer: "https://www.youtube.com/watch?v=nwtaq56pgIo",
-            fullplaylist: "https://www.youtube.com/playlist?list=PLszepnkojZI4rYdmvANDXm4Dx6_xi4Xfi",
-          },
-          {
-            id: 6,
-            title: "A Tale of Thousand Stars",
-            image: "/images/1000stars.jpg",
-            shortDescription: "A heartwarming story of love and self-discovery in the mountains.",
-            synopsis: "Tian, a young man diagnosed with a terminal illness, is sent to a remote village as part of his treatment. There, he meets Phupha, a forest ranger with a mysterious past. Together, they embark on a journey to fulfill Tian’s wish of finding a missing person's belongings. As they grow closer, their relationship evolves into a deep bond, filled with love and healing. Amid emotional struggles, they learn to live in the moment and discover the transformative power of love.",
-            releaseDate: "January 29, 2021",
-            genre: ["Romance", "Drama", "LGBTQ+"],
-            trailer: "https://www.youtube.com/watch?v=o-gaRz2AE_Y",
-            fullplaylist: "https://www.youtube.com/playlist?list=PLszepnkojZI4DTG4wQ60bVOgIkN6ZjW2s",
-          },
-          
-          { 
 
-          id: 7,
-          title: "Love in the Air",
-          image: "/images/love-in-the-air.png",
-          shortDescription: "A steamy romance between a pilot and a flight attendant.",
-          synopsis: "Prapai, a confident pilot, and Sky, a reserved flight attendant, find themselves drawn to each other despite their differences.",
-          cast: [
-            { name: "Boss Chaikamon", role: "Prapai" },
-            { name: "Noeul Nuttarat", role: "Sky" },
-          ],
-          releaseDate: "August 18, 2022",
-          genre: ["Romance", "Drama", "LGBTQ+"],
-          trailer: "https://www.youtube.com/watch?v=HTTVO7IMVf0",
-          fullplaylist: "https://www.youtube.com/playlist?list=PLYYyUhZKiEj4n5ha7Llxx7dkb21x0h6tw",
-        
-        },
-        {
-          id: 13,
-          title: "KinnPorsche: The Series",
-          image: "/images/kinnporsche.jpg",
-          shortDescription: "A mafia romance filled with danger, passion, and intrigue.",
-          synopsis: "Kinn, a mafia heir, hires Porsche as his bodyguard. As they navigate the dangerous underworld, their relationship evolves into something deeper.",
-          cast: [
-            { name: "Mile Phakphum", role: "Kinn" },
-            { name: "Apo Nattawin", role: "Porsche" },
-          ],
-          releaseDate: "April 2, 2022",
-          genre: ["Romance", "Action", "Drama"],
-          trailer: "https://www.youtube.com/watch?v=dZvpNreGVOc",
-          fullplaylist: "https://www.youtube.com/playlist?list=PLXopbKxiivxoY5GPjP6hhKVmcYsaBHGWj",
-        
-        },
-        {
-          id: 14,
-          title: "Cutie Pie",
-          image: "/images/cutie-pie.jpg",
-          shortDescription: "A sweet and fluffy romance between two young men bound by an arranged marriage.",
-          synopsis: "Lian and Kuea are engaged due to a family arrangement. As they spend time together, they discover genuine feelings for each other.",
-          cast: [
-            { name: "Zee Pruk", role: "Lian" },
-            { name: "NuNew Chawarin", role: "Kuea" },
-          ],
-          releaseDate: "February 18, 2022",
-          genre: ["Romance", "Comedy", "Drama"],
-          trailer: "https://www.youtube.com/watch?v=J9_kF-esM0w",
-          fullplaylist: "https://www.youtube.com/playlist?list=PLYYyUhZKiEj4__l--wuWGyCQOzT1bj7Cd",
-        },
-        ];
-       this.series = seriesList.find(series => series.id === parseInt(this.id));
 
-    // Check if the series requires a plan and the user doesn't have one
-    if (this.series.requiresPlan && !this.userHasPlan) {
-      this.$router.push({ path: '/pricing' });
-    }
+
+<script>
+import seriesData from '@/assets/series.json'; // Import the JSON file
+
+export default {
+  name: 'SeriesDetail',
+  props: ['id'],
+  data() {
+    return {
+      series: null, // Initialize as null
+      userHasPlan: false,
+      isLoading: true, // Add a loading state
+    };
   },
-  checkUserPlan() {
-    const userPlan = localStorage.getItem('userPlan'); // Check if the user has a plan
-    this.userHasPlan = !!userPlan; // Set to true if the user has a plan
+  created() {
+    this.fetchSeriesDetail();
+    this.checkUserPlan();
   },
+  methods: {
+    fetchSeriesDetail() {
+      this.isLoading = true; // Start loading
 
-      getEmbedUrl(url) {
-        if (!url) return '';
-        if (url.includes('watch?v=')) {
-          return url.replace('watch?v=', 'embed/');
-        }
-        return url;
-      },
-      extractPlaylistId(url) {
-        // Extract the playlist ID from the URL
-        const match = url.match(/list=([^&]+)/);
-        return match ? match[1] : '';
-      },
-      iframeLoaded() {
-        console.log('Iframe loaded successfully');
-      },
+      // Check if seriesData is valid
+      if (!Array.isArray(seriesData)) {
+        console.error('seriesData is not a valid array');
+        this.isLoading = false;
+        return;
+      }
+
+      // Check if this.id is a valid number
+      const seriesId = parseInt(this.id);
+      if (isNaN(seriesId)) {
+        console.error('Invalid series ID:', this.id);
+        this.isLoading = false;
+        return;
+      }
+
+      // Find the series with the matching ID
+      this.series = seriesData.find(series => series.id === seriesId);
+
+      // Check if the series exists
+      if (!this.series) {
+        console.error('Series not found with ID:', seriesId);
+        this.isLoading = false;
+        return;
+      }
+
+      // Check if the series requires a plan and the user doesn't have one
+      if (this.series.requiresPlan && !this.userHasPlan) {
+        this.$router.push({ path: '/pricing' });
+      }
+
+      this.isLoading = false; // End loading
     },
-  };
-  </script>
-  
+    checkUserPlan() {
+      const userPlan = localStorage.getItem('userPlan'); // Check if the user has a plan
+      this.userHasPlan = !!userPlan; // Set to true if the user has a plan
+    },
+    getEmbedUrl(url) {
+      if (!url) return '';
+      if (url.includes('watch?v=')) {
+        return url.replace('watch?v=', 'embed/');
+      }
+      return url;
+    },
+    extractPlaylistId(url) {
+      // Extract the playlist ID from the URL
+      const match = url.match(/list=([^&]+)/);
+      return match ? match[1] : '';
+    },
+    iframeLoaded() {
+      console.log('Iframe loaded successfully');
+    },
+    handleScroll() {
+      this.showScrollToTop = window.scrollY > 200;
+    },
+    scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+  },
+};
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
   <style scoped>
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
   

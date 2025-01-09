@@ -1,26 +1,82 @@
 <template>
-    <div class="home">
-      <!-- Video Background -->
-      <video autoplay muted loop class="video-background">
-        <source src="/images/home.mp4" type="video/mp4" />
-        <img src="/images/fallback-image.jpg" alt="Fallback Image" />
-        Your browser does not support the video tag.
-      </video>
-  
-      <!-- Hero Section -->
-      <div class="hero-section text-center">
-        <h1 class="display-3 fw-bold">Welcome to Thai BL Recommendations</h1>
-        <p class="lead fs-4">Discover the best Thai Boys' Love series!</p>
-        <router-link to="/recommendations" class="btn btn-lg btn-primary mt-3">
-          Explore Recommendations
-        </router-link>
-      </div>
+  <div class="home" @mousemove="onUserActivity" @click="onUserActivity">
+    <!-- Video Background -->
+    <video ref="videoPlayer" autoplay muted loop playsinline class="video-background">
+      <source src="/images/home.mp4" type="video/mp4" />
+      <img src="/images/fallback-image.jpg" alt="Fallback Image" />
+      Your browser does not support the video tag.
+    </video>
+
+    <!-- Hero Section -->
+    <div class="hero-section text-center">
+      <h1 class="display-3 fw-bold mobile-hide">Heart of Thai Boys' Love!</h1>
+      <p class="lead fs-2">Find your next favorite series and immerse yourself in heartfelt tales of romance and connection</p>
+      <router-link to="/recommendations" class="btn btn-lg btn-primary mt-3">
+        Explore Recommendations
+      </router-link>
     </div>
-  </template>
+  </div>
+</template>
 
 <script>
 export default {
   name: 'Home',
+  data() {
+    return {
+      inactivityTimer: null, // Timer for resuming video playback
+    };
+  },
+  mounted() {
+    // Start playing the video when the component is mounted
+    this.playVideo();
+
+    // Set up event listeners for user activity
+    window.addEventListener('mousemove', this.onUserActivity);
+    window.addEventListener('click', this.onUserActivity);
+  },
+  beforeUnmount() {
+    // Clean up event listeners when the component is destroyed
+    window.removeEventListener('mousemove', this.onUserActivity);
+    window.removeEventListener('click', this.onUserActivity);
+
+    // Clear any existing timers
+    if (this.inactivityTimer) {
+      clearTimeout(this.inactivityTimer);
+    }
+
+    // Pause the video before unmounting
+    this.pauseVideo();
+  },
+  methods: {
+    playVideo() {
+      const video = this.$refs.videoPlayer;
+      if (video) {
+        video.play().catch((error) => {
+          console.error('Video play failed:', error);
+        });
+      }
+    },
+    pauseVideo() {
+      const video = this.$refs.videoPlayer;
+      if (video) {
+        video.pause();
+      }
+    },
+    onUserActivity() {
+      // Pause the video when user is active
+      this.pauseVideo();
+
+      // Clear any existing timers
+      if (this.inactivityTimer) {
+        clearTimeout(this.inactivityTimer);
+      }
+
+      // Set a timer to resume playback after 3 seconds of inactivity
+      this.inactivityTimer = setTimeout(() => {
+        this.playVideo();
+      }, 3000);
+    },
+  },
 };
 </script>
 
@@ -128,6 +184,11 @@ p {
   .btn-primary {
     font-size: 1rem;
     padding: 10px 25px;
+  }
+
+  /* Hide the <h1> tag on mobile */
+  .mobile-hide {
+    display: none;
   }
 }
 </style>

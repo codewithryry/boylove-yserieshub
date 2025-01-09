@@ -11,19 +11,56 @@
             class="me-2"
             style="height: 45px; width: auto;"
           />
-          <span class="fw-bold">Thai BL</span>
+          <span class="fw-bold">YSeriesHub</span>
         </router-link>
 
-        <!-- Toggle Button for Mobile -->
-        <button
-          class="navbar-toggler"
-          type="button"
-          @click="toggleSidebar"
-        >
-          <i class="fas fa-bars navbar-toggler-icon-black"></i>
-        </button>
+        <!-- Mobile Profile and Hamburger -->
+        <div class="d-flex align-items-center d-lg-none">
+          <!-- Profile Icon (Mobile Only) -->
+          <div v-if="user" class="nav-item dropdown me-3">
+            <a
+              class="nav-link dropdown-toggle no-arrow"
+              href="#"
+              id="profileDropdownMobile"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <img
+                v-if="user.photoURL"
+                :src="user.photoURL"
+                alt="Profile Picture"
+                class="rounded-circle"
+                style="width: 30px; height: 30px; object-fit: cover;"
+              />
+              <i v-else class="fas fa-user"></i>
+            </a>
+            <!-- Dropdown Menu for Mobile -->
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdownMobile">
+              <li>
+                <router-link to="/profile" class="dropdown-item">
+                  <i class=""></i>Profile
+                </router-link>
+              </li>
+              <li>
+                <a href="#" class="dropdown-item" @click="handleLogout">
+                  <i class=""></i>Logout
+                </a>
+              </li>
+            </ul>
+          </div>
 
-        <!-- Navbar Links -->
+          <!-- Hamburger Menu -->
+          <button class="navbar-toggler" type="button" @click="toggleSidebar">
+            <div class="hamburger" :class="{ 'open': isSidebarOpen }">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </button>
+        </div>
+
+        <!-- Navbar Links (Hidden on Mobile) -->
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
             <!-- Other Nav Items -->
@@ -43,6 +80,10 @@
               <router-link to="/pricing" class="nav-link">Pricing</router-link>
             </li>
 
+            <!-- Add YChat Link -->
+          <li class="nav-item">
+            <router-link to="/ychat" class="nav-link">YChat</router-link>
+          </li>
             <!-- More Dropdown -->
             <li class="nav-item dropdown">
               <a
@@ -58,27 +99,27 @@
               <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <li>
                   <router-link to="/about" class="dropdown-item custom-dropdown-item">
-                    <i class="fas fa-info-circle me-2"></i>About
+                    <i class=""></i>About
                   </router-link>
                 </li>
                 <li>
                   <router-link to="/contact" class="dropdown-item custom-dropdown-item">
-                    <i class="fas fa-envelope me-2"></i>Contact
+                    <i class=" "></i>Contact
                   </router-link>
                 </li>
                 <li>
                   <router-link to="/feedback" class="dropdown-item custom-dropdown-item">
-                    <i class="fas fa-comment-dots me-2"></i>Feedback
+                    <i class=" "></i>Feedback
                   </router-link>
                 </li>
                 <li>
                   <router-link to="/thailator-ai" class="dropdown-item custom-dropdown-item">
-                    <i class="fas fa-language me-2"></i>Thai-Eng
+                    <i class=""></i>Thai-Eng
                   </router-link>
                 </li>
                 <li>
                   <router-link to="/faq" class="dropdown-item custom-dropdown-item">
-                    <i class="fas fa-question-circle me-2"></i>FAQs
+                    <i class=""></i>FAQs
                   </router-link>
                 </li>
               </ul>
@@ -89,8 +130,8 @@
               <router-link to="/login" class="nav-link">Login</router-link>
             </li>
 
-            <!-- Profile Dropdown (Shown when user is logged in) -->
-            <li v-else class="nav-item dropdown">
+            <!-- Profile Dropdown (Hidden on Mobile) -->
+            <li v-else class="nav-item dropdown d-none d-lg-block">
               <a
                 class="nav-link dropdown-toggle no-arrow"
                 href="#"
@@ -99,7 +140,6 @@
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
-                <!-- Display User's Profile Picture -->
                 <img
                   v-if="user.photoURL"
                   :src="user.photoURL"
@@ -107,18 +147,17 @@
                   class="rounded-circle"
                   style="width: 30px; height: 30px; object-fit: cover;"
                 />
-                <!-- Fallback to User Icon if No Profile Picture -->
                 <i v-else class="fas fa-user"></i>
               </a>
-              <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
                 <li>
                   <router-link to="/profile" class="dropdown-item">
-                    <i class="fas fa-user-circle me-2"></i>Profile
+                    <i class=""></i>Profile
                   </router-link>
                 </li>
                 <li>
                   <a href="#" class="dropdown-item" @click="handleLogout">
-                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    <i class=""></i>Logout
                   </a>
                 </li>
               </ul>
@@ -128,88 +167,136 @@
       </div>
     </nav>
 
-    <!-- Sidebar for Mobile -->
-    <div class="sidebar-overlay" :class="{ show: isSidebarOpen }" @click="closeSidebar"></div>
-    <div class="sidebar" :class="{ show: isSidebarOpen }">
-      <button class="sidebar-close" @click="closeSidebar">
-        <i class="fas fa-times"></i>
-      </button>
-      <br>
-      <br>
-      <ul class="sidebar-nav">
-        <!-- Sidebar Links -->
-        <li class="sidebar-item">
-          <router-link to="/" class="sidebar-link" @click="closeSidebar">
-            <i class="fas fa-home me-2"></i>Home
-          </router-link>
-        </li>
-        <li class="sidebar-item">
-          <router-link to="/recommendations" class="sidebar-link" @click="closeSidebar">
-            <i class="fas fa-tv me-2"></i>Series
-          </router-link>
-        </li>
-        <li class="sidebar-item">
-          <router-link to="/songs" class="sidebar-link" @click="closeSidebar">
-            <i class="fas fa-music me-2"></i>Music
-          </router-link>
-        </li>
-        <li class="sidebar-item">
-          <router-link to="/blog" class="sidebar-link" @click="closeSidebar">
-            <i class="fas fa-blog me-2"></i>Blogs
-          </router-link>
-        </li>
-  
-        <br>
-        <li class="sidebar-item">
-          <router-link to="/pricing" class="sidebar-link" @click="closeSidebar">
-            <i class="fas fa-dollar-sign me-2"></i>Subscription 
-          </router-link>
-        </li>
+    <!-- Sidebar -->
+    <nav class="sidebar" :class="{ open: isSidebarOpen }">
+      <div class="logo_items flex">
+        <span class="nav_image">
+          <img src="/images/boylove.png" alt="logo_img" />
+        </span>
+        <span class="logo_name">YSeriesHub</span>
+        <i class="bx bx-x" id="sidebar-close" @click="toggleSidebar" style="color: #000000;"></i>
+      </div>
 
-        <br>
+      <div class="menu_container">
+        <div class="menu_items">
+          <ul class="menu_item">
+            <div class="menu_title flex">
+              <span class="title">Dashboard</span>
+            </div>
+            <li class="item">
+              <router-link to="/" class="link flex" @click="closeSidebar">
+                <i class="bx bx-grid-alt"></i>
+                <span>Home</span>
+              </router-link>
+            </li>
+          </ul>
 
-        <!-- More Dropdown Items -->
-        <li class="sidebar-item">
-          <router-link to="/about" class="sidebar-link" @click="closeSidebar">
-            <i class="fas fa-info-circle me-2"></i>About
-          </router-link>
-        </li>
-        <li class="sidebar-item">
-          <router-link to="/feedback" class="sidebar-link" @click="closeSidebar">
-            <i class="fas fa-comment-dots me-2"></i>Feedback
-          </router-link>
-        </li>
-        <li class="sidebar-item">
-          <router-link to="/faq" class="sidebar-link" @click="closeSidebar">
-            <i class="fas fa-question-circle me-2"></i>FAQs
-          </router-link>
-        </li>
-        <br>
-        <br>
-        <br>
+          <ul class="menu_item">
+            <div class="menu_title flex">
+              <span class="title">Content</span>
+            </div>
+            <li class="item">
+              <router-link to="/recommendations" class="link flex" @click="closeSidebar">
+                <i class="bx bx-grid-alt"></i>
+                <span>All Series</span>
+              </router-link>
+            </li>
+            <li class="item">
+              <router-link to="/songs" class="link flex" @click="closeSidebar">
+                <i class="bx bx-music"></i>
+                <span>Music</span>
+              </router-link>
+            </li>
+            <li class="item">
+              <router-link to="/blog" class="link flex" @click="closeSidebar">
+                <i class="bx bx-news"></i>
+                <span>Blogs</span>
+              </router-link>
+            </li>
+          </ul>
 
-        <!-- Profile Links in Sidebar (Shown when user is logged in) -->
-        <template v-if="user">
-          <li class="sidebar-item">
-            <router-link to="/profile" class="sidebar-link" @click="closeSidebar">
-              <i class="fas fa-user-circle me-2"></i>Profile
-            </router-link>
-          </li>
-          <li class="sidebar-item">
-            <a href="#" class="sidebar-link" @click="handleLogout">
-              <i class="fas fa-sign-out-alt me-2"></i>Logout
-            </a>
-          </li>
-        </template>
+          <ul class="menu_item">
+            <div class="menu_title flex">
+              <span class="title">Messenges</span>
+            </div>
+            <li class="item">
+              <router-link to="/ychat" class="link flex" @click="closeSidebar">
+                <i class="bx bx-grid-alt"></i>
+                <span>Ychat</span>
+              </router-link>
+            </li>
+          </ul>
 
-        <!-- Login Link in Sidebar (Shown when user is not logged in) -->
-        <li v-else class="sidebar-item">
-          <router-link to="/login" class="sidebar-link" @click="closeSidebar">
-            <i class="fas fa-sign-in-alt me-2"></i>Login
-          </router-link>
-        </li>
-      </ul>
-    </div>
+          <ul class="menu_item">
+            <div class="menu_title flex">
+              <span class="title">Others</span>
+            </div>
+            <li class="item">
+              <router-link to="/about" class="link flex" @click="closeSidebar">
+                <i class="bx bx-info-circle"></i>
+                <span>About</span>
+              </router-link>
+            </li>
+            <li class="item">
+              <router-link to="/pricing" class="link flex" @click="closeSidebar">
+                <i class="bx bx-dollar-circle"></i>
+                <span>Subscription</span>
+              </router-link>
+            </li>
+            <li class="item">
+              <router-link to="/feedback" class="link flex" @click="closeSidebar">
+                <i class="bx bx-comment-dots"></i>
+                <span>Feedback</span>
+              </router-link>
+            </li>
+            <li class="item">
+              <router-link to="/thailator-ai" class="link flex" @click="closeSidebar">
+                <i class="bx bx-info-circle"></i>
+                <span>ThailatorAI</span>
+              </router-link>
+            </li>
+
+            <li class="item">
+              <router-link to="/faq" class="link flex" @click="closeSidebar">
+                <i class="bx bx-question-mark"></i>
+                <span>FAQs</span>
+              </router-link>
+            </li>
+          </ul>
+
+          <!-- Login/Logout Section -->
+          <ul class="menu_item">
+            <div class="menu_title flex">
+              <span class="title">Account</span>
+            </div>
+            <!-- Show Login if user is not logged in -->
+            <li v-if="!user" class="item">
+              <router-link to="/login" class="link flex" @click="closeSidebar">
+                <i class="bx bx-log-in"></i>
+                <span>Login</span>
+              </router-link>
+            </li>
+            <!-- Show Logout if user is logged in -->
+            <li v-else class="item">
+              <a href="#" class="link flex" @click="handleLogout">
+                <i class="bx bx-log-out"></i>
+                <span>Logout</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Sidebar Profile -->
+        <div class="sidebar_profile flex" v-if="user">
+          <span class="nav_image">
+            <img :src="user.photoURL || '/images/profile.jpg'" alt="logo_img" />
+          </span>
+          <div class="data_text">
+            <span class="name">{{ user.displayName || "User" }}</span>
+          </div>
+        </div>
+      </div>
+    </nav>
 
     <!-- Router View -->
     <router-view />
@@ -217,23 +304,62 @@
     <!-- Footer -->
     <footer class="footer mt-auto py-3 bg-light">
       <div class="container text-center">
-        <span class="text-muted">© 2025 Thai BL Recommendations. All rights reserved.</span>
+        <span class="text-muted">© 2025 YSeriesHub. All rights reserved.</span>
       </div>
     </footer>
   </div>
 </template>
 
 
+<style>
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
 
 
+/* Mobile Profile and Hamburger Alignment */
+.d-flex.align-items-center.d-lg-none {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Adjust spacing between profile and hamburger */
+}
 
+/* Hide Profile in Navbar Links on Mobile */
+.d-none.d-lg-block {
+  display: none;
+}
 
+@media (min-width: 992px) {
+  .d-none.d-lg-block {
+    display: block;
+  }
+}
 
+.hamburger span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background-color: #000000;
+  transition: all 0.3s ease;
+}
 
+.hamburger.open span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
 
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
 
-
-
+.hamburger.open span:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+</style>
 
 <script>
 import { auth } from "./firebase";
@@ -243,34 +369,30 @@ export default {
   name: 'App',
   data() {
     return {
-      isSidebarOpen: false, // Track sidebar state
-      user: null, // Tracks the logged-in user
+      isSidebarOpen: false, // Sidebar is closed by default
+      user: null,
     };
   },
   methods: {
-    // Toggle sidebar
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen;
     },
-    // Close sidebar
     closeSidebar() {
       this.isSidebarOpen = false;
     },
-    // Logout method
     async handleLogout() {
       try {
         await signOut(auth);
-        this.user = null; // Clear the user state
-        this.$router.push("/login"); // Redirect to login page
+        this.user = null;
+        this.$router.push("/login");
       } catch (error) {
         console.error("Error during logout:", error.message);
       }
     },
   },
   mounted() {
-    // Listen for authentication state changes
     onAuthStateChanged(auth, (user) => {
-      this.user = user; // Update the user state
+      this.user = user;
     });
   },
 };
@@ -279,12 +401,11 @@ export default {
 
 
 <style>
-/* Modern Font */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
+/* Import Poppins font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
 #app {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Poppins', sans-serif; /* Replace with your preferred font */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
@@ -294,122 +415,257 @@ export default {
   flex-direction: column;
 }
 
+/* Pre css */
+.flex {
+  display: flex;
+  align-items: center;
+}
+
+
+/* Sidebar Close Icon */
+#sidebar-close {
+  padding: 10px;
+  color: #000000; /* Black color */
+  font-size: 25px;
+  cursor: pointer;
+  margin-left: auto;
+  transition: all 0.3s ease;
+}
+
+#sidebar-close:hover {
+  color: #4070f4; /* Highlight color on hover */
+}
+
+.nav_image {
+  display: flex;
+  min-width: 55px;
+  justify-content: center;
+}
+
+.nav_image img {
+  height: 35px;
+  width: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+
+#sidebar-close {
+  padding: 10px;
+  color: #000000; /* Black color */
+  font-size: 25px;
+  cursor: pointer;
+  margin-left: auto;
+  transition: all 0.3s ease;
+}
+
+#sidebar-close:hover {
+  color: #4070f4; /* Highlight color on hover */
+}
+
+/* Remove the dropdown arrow */
 .no-arrow::after {
   display: none !important;
 }
 
-/* Navbar Styling */
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -300px; /* Hidden by default */
+  height: 100%;
+  width: 300px; /* Adjusted width */
+  background: #ffffff;
+  padding: 20px;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  transition: all 0.4s ease;
+  z-index: 1000;
+  font-family: 'Poppins', sans-serif;
+}
+
+.sidebar.open {
+  left: 0; /* Show sidebar */
+}
+
+.logo_items {
+  gap: 10px;
+  padding-left: 10px;
+}
+
+.logo_name {
+  font-size: 24px;
+  color: #2c3e50; /* Dark blue for contrast */
+  font-weight: 600;
+}
+
+#sidebar-close {
+  padding: 10px;
+  color: #2c3e50;
+  font-size: 25px;
+  cursor: pointer;
+  margin-left: auto;
+  transition: all 0.3s ease;
+}
+
+#sidebar-close:hover {
+  color: #4070f4; /* Highlight color on hover */
+}
+
+.menu_container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-top: 40px;
+  overflow-y: auto;
+  height: calc(100% - 100px);
+}
+
+.menu_container::-webkit-scrollbar {
+  display: none;
+}
+
+.menu_title {
+  position: relative;
+  height: 50px;
+  width: 100%;
+  padding-left: 10px;
+}
+
+.menu_title .title {
+  font-size: 18px;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.menu_title .line {
+  position: absolute;
+  left: 10px;
+  height: 3px;
+  width: 30px;
+  border-radius: 25px;
+  background: #4070f4; /* Blue accent color */
+}
+
+.item {
+  list-style: none;
+  margin: 10px 0;
+}
+
+.link {
+  text-decoration: none;
+  border-radius: 8px;
+  padding: 10px 15px;
+  color: #2c3e50;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.3s ease;
+}
+
+.link:hover {
+  color: #ffffff;
+  background-color: #4070f4; /* Blue background on hover */
+}
+
+.link span {
+  white-space: nowrap;
+}
+
+.link i {
+  height: 50px;
+  min-width: 55px;
+  display: flex;
+  font-size: 22px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.sidebar_profile {
+  padding-top: 20px;
+  margin-top: 20px;
+  gap: 15px;
+  border-top: 2px solid rgba(0, 0, 0, 0.1);
+  padding-left: 10px;
+}
+
+.sidebar_profile .name {
+  font-size: 18px;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.sidebar_profile .email {
+  font-size: 14px;
+  color: #666;
+}
+
 .navbar {
-  background: linear-gradient(135deg, #2c3e50, #1a252f); /* Gradient background */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  background-color: rgba(255, 255, 255, 0.95); /* Almost white with slight opacity */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  height: 70px; /* Slightly taller navbar */
+  font-family: 'Poppins', sans-serif;
+}
+
+.navbar-dark .navbar-toggler-icon {
+  background-image: none; /* Remove Bootstrap's default icon */
+  color: #000000; /* Black color for the toggle icon */
 }
 
 .navbar-brand {
-  font-weight: 700;
-  font-size: 1.5rem;
-  color: #000000 !important;
+  color: #000000 !important; /* Black color for the brand */
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
 }
 
 .nav-link {
-  color: rgba(0, 0, 0, 0.8) !important;
-  font-weight: 600;
-  margin: 0 10px;
+  color: #000000 !important; /* Black color for the links */
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+
+  letter-spacing: 0.4px;
   transition: all 0.3s ease;
 }
 
 .nav-link:hover {
-  color: #000000 !important;
-  transform: translateY(-2px); /* Lift effect on hover */
+  color: #4070f4 !important; /* Highlight color on hover */
+  transform: translateY(-2px);
 }
 
-/* Dropdown Menu Styling */
-.dropdown-menu {
-  border: none;
-  border-radius: 10px; /* Rounded corners */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-}
-
-.dropdown-item {
-  color: #000000 !important;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.dropdown-item:hover {
-  color: #3d3636 !important;
-  background: transparent;
-  transform: translateX(5px); /* Slide effect on hover */
-}
-.navbar-toggler-icon-black {
+/* Sidebar Close Icon */
+#sidebar-close {
+  padding: 10px;
   color: #000000; /* Black color */
-}
-
-/* Sidebar Styling */
-.sidebar {
-  position: fixed;
-  top: 0;
-  right: -280px; /* Hide sidebar by default on the right */
-  width: 160px;
-  height: 100vh;
-  background-color: #ffffff;
-  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.1); /* Shadow on the left side */
+  font-size: 25px;
+  cursor: pointer;
+  margin-left: auto;
   transition: all 0.3s ease;
-  z-index: 1000;
 }
 
-.sidebar.show {
-  right: 0; /* Show sidebar by moving it to the right */
+#sidebar-close:hover {
+  color: #4070f4; /* Highlight color on hover */
 }
 
-.sidebar-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-  display: none;
+
+/* Footer */
+.footer {
+  font-family: 'Poppins', sans-serif;
+  background-color: #2c3e50; /* Dark background for footer */
+  color: #ffffff;
+  padding: 20px 0;
 }
 
-.sidebar-overlay.show {
-  display: block;
-}
+/* Responsive */
+@media screen and (max-width: 800px) {
+  .sidebar {
+    left: -300px;
+  }
 
-.sidebar-close {
-  position: absolute;
-  top: 10px;
-  left: 10px; /* Move close button to the left */
-  background: none;
-  border: none;
-  color: #000000;
-  font-size: 1.5rem;
-}
+  .sidebar.open {
+    left: 0;
+  }
 
-.sidebar-nav {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.sidebar-item {
-  padding: 10px 15px;
-  text-align: left; /* Ensure text is aligned to the left */
-}
-
-.sidebar-link {
-  color: rgba(0, 0, 0, 0.8);
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  padding-left: 0; /* Ensure no padding on the left */
-}
-
-.sidebar-link:hover {
-  color: rgb(0, 0, 0);
-}
-
-.sidebar-link i {
-  margin-right: 10px;
+  #sidebar-close {
+    display: block;
+  }
 }
 </style>

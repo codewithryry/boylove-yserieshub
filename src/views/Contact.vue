@@ -33,17 +33,29 @@
             rows="5"
             v-model="formData.message"
             placeholder="Enter your message"
+            maxlength="500"
             required
           ></textarea>
+          <small class="char-counter">{{ formData.message.length }}/500</small>
         </div>
-        <div class="text-center">
-          <button type="submit" class="btn btn-modern btn-lg" :disabled="isSubmitting">
-            {{ isSubmitting ? 'Submitting...' : 'Submit' }}
-          </button>
-        </div>
+        <div class="d-flex justify-content-end">
+  <button type="submit" class="btn btn-modern btn-lg" :disabled="isSubmitting">
+    {{ isSubmitting ? 'Submitting...' : 'Submit' }}
+  </button>
+</div>
         <small v-if="errorMessage" class="error-message">{{ errorMessage }}</small>
-        <small v-if="successMessage" class="success-message">{{ successMessage }}</small>
       </form>
+    </div>
+
+    <!-- Success Modal -->
+    <div v-if="showSuccessModal" class="modal-overlay">
+      <div class="modal-content">
+        <h3>Success!</h3>
+        <p>{{ successMessage }}</p>
+        <div class="modal-actions">
+          <button @click="showSuccessModal = false" class="btn btn-confirm">Close</button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -64,6 +76,7 @@ export default {
       isSubmitting: false, // Loading state for form submission
       errorMessage: '', // Error message for user feedback
       successMessage: '', // Success message for user feedback
+      showSuccessModal: false, // Control success modal visibility
     };
   },
   methods: {
@@ -90,6 +103,7 @@ export default {
         // Clear the form and show success message
         this.formData = { name: '', email: '', message: '' };
         this.successMessage = 'Thank you for contacting us! We will get back to you soon.';
+        this.showSuccessModal = true; // Show success modal
       } catch (error) {
         this.errorMessage = 'Failed to submit your message. Please try again.';
         console.error("Error submitting form:", error);
@@ -145,29 +159,39 @@ textarea.form-control {
   resize: vertical; /* Allow vertical resizing */
 }
 
-/* Modern Button Styling */
+/* Character Counter */
+.char-counter {
+  display: block;
+  text-align: right;
+  font-size: 0.875rem;
+  color: #777;
+  margin-top: 5px;
+}
+
 .btn-modern {
-  background: linear-gradient(135deg, #42b983, #369b6e); /* Gradient background */
-  border: none;
-  padding: 14px 28px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: white;
-  border-radius: 50px; /* Rounded button */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-  transition: all 0.3s ease;
+  padding: 10px 20px; /* Same padding as .btn-load-more */
+  background: linear-gradient(135deg, #6a11cb, #2575fc); /* Same gradient background */
+  border: none; /* Remove border */
+  color: #fff; /* White text color */
+  border-radius: 8px; /* Same border radius */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s ease; /* Smooth transition */
+  font-size: 1rem; /* Adjust font size if needed */
+  font-weight: 600; /* Bold text */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
 }
 
 .btn-modern:hover {
-  background: linear-gradient(135deg, #369b6e, #42b983); /* Gradient hover effect */
-  transform: translateY(-2px); /* Lift effect on hover */
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+  background: linear-gradient(135deg, #2575fc, #6a11cb); /* Reverse gradient on hover */
+  transform: translateY(-2px); /* Optional: Lift effect on hover */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Optional: Enhanced shadow on hover */
 }
 
 .btn-modern:active {
   transform: translateY(0); /* Reset lift effect on click */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Reset shadow on click */
 }
+
 
 /* Error and Success Messages */
 .error-message {
@@ -178,12 +202,50 @@ textarea.form-control {
   text-align: center;
 }
 
-.success-message {
-  color: #28a745;
-  font-size: 0.875rem;
-  margin-top: 10px;
-  display: block;
+/* Success Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 400px;
+  width: 100%;
   text-align: center;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn-confirm {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-confirm:hover {
+  background: linear-gradient(135deg, #2575fc, #6a11cb);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Responsive Design */

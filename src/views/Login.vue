@@ -4,8 +4,14 @@
     <section class="py-3 py-md-5 py-xl-8" style="background: linear-gradient(135deg, rgba(106, 17, 203, 0.7), rgba(37, 117, 252, 0.7));">
       <div class="container">
         <div class="row gy-4 align-items-center">
+          <!-- Left Column: Notification Message -->
           <div class="col-12 col-md-6 col-xl-7">
-            <div class="d-flex justify-content-center"></div>
+            <div class="notification-message text-white p-4 rounded-4">
+              <p class="lead mb-4">
+                Please note that <strong>only Google login</strong> is currently available. 
+                Other login methods are under development and will be available soon.
+              </p>
+            </div>
           </div>
 
           <!-- Right Column: Login Form -->
@@ -61,13 +67,6 @@
                     </div>
                   </div>
                 </form>
-                <div class="row">
-                  <div class="col-12">
-                    <div class="d-flex gap-2 gap-md-4 flex-column flex-md-row justify-content-md-end mt-4">
-                      <a href="#!">Forgot password</a>
-                    </div>
-                  </div>
-                </div>
                 <div class="row">
                   <div class="col-12">
                     <p class="mt-4 mb-4">Or continue with</p>
@@ -132,6 +131,16 @@
     </section>
   </div>
 </template>
+
+
+
+
+
+
+
+
+
+
 
 
 <script>
@@ -228,9 +237,35 @@ section {
   height: 100vh; /* Make sure the section takes the full height of the viewport */
 }
 
+/* Notification Message */
+.notification-message {
+  background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Light border */
+  backdrop-filter: blur(10px); /* Blur effect */
+  animation: fadeIn 0.5s ease-in-out;
+  margin-top: 20rem; /* Move the notification up */
+}
+
+.notification-message h2 {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.notification-message p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.notification-message i {
+  color: #ffffff; /* Icon color */
+}
+
+
+/* Responsive Design */
 @media (max-width: 767px) {
-  section {
-    height: 100vh; /* Ensure full height on smaller screens */
+  .notification-message {
+    margin-top: 0; /* Reset margin for mobile */
+    order: -1; /* Move the notification to the top on mobile */
   }
 }
 </style>

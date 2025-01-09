@@ -21,7 +21,9 @@
             rows="10"
             class="input-text"
             :disabled="isLoading"
+            maxlength="500" 
           ></textarea>
+          <p class="char-counter">{{ inputText.length }}/500</p> <!-- Character counter -->
         </div>
         <div class="output-container">
           <textarea
@@ -55,7 +57,6 @@
     </div>
   </div>
 </template>
-
 
 <script>
 import { auth, db } from '../firebase'; // Import Firebase auth and Firestore
@@ -181,177 +182,176 @@ export default {
   },
 };
 </script>
-  
-  <style scoped>
-  /* Modern Font */
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
-  
-  .translator {
-    padding: 40px 20px;
-    text-align: center;
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-    min-height: 100vh;
-  }
-  
+<style scoped>
+/* Modern Font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+.translator {
+  padding: 40px 20px;
+  text-align: center;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+p {
+  font-size: 1.25rem;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+.language-swap {
+  margin-bottom: 20px;
+}
+
+.btn-swap {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #6a11cb, #2575fc); /* Updated gradient */
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.btn-swap:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.translation-form {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.input-container,
+.output-container {
+  flex: 1;
+  position: relative;
+}
+
+textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid rgba(221, 221, 221, 0.5);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: 'Poppins', sans-serif;
+  resize: vertical;
+  background: rgba(255, 255, 255, 0.8); /* Glassmorphism effect */
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+textarea:focus {
+  border-color: #6a11cb; /* Updated to match gradient */
+  box-shadow: 0 4px 15px rgba(106, 17, 203, 0.3); /* Updated to match gradient */
+}
+
+.output-text {
+  background: rgba(248, 249, 250, 0.8); /* Glassmorphism effect */
+}
+
+.btn-speak {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  background: rgba(255, 255, 255, 0.9); /* Glassmorphism effect */
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-speak:hover {
+  transform: scale(1.1);
+  background: rgba(255, 255, 255, 1);
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.9); /* Glassmorphism effect */
+}
+
+.modal-content {
+  text-align: center;
+}
+
+.modal-close-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #6a11cb, #2575fc); /* Updated gradient */
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.modal-close-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
   h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #2c3e50;
-    margin-bottom: 10px;
-  }
-  
-  p {
-    font-size: 1.25rem;
-    color: #555;
-    margin-bottom: 20px;
-  }
-  
-  .language-swap {
-    margin-bottom: 20px;
-  }
-  
-  .btn-swap {
-    padding: 10px 20px;
-    background: linear-gradient(135deg, #4caf50, #45a049);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 600;
-  }
-  
-  .btn-swap:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  }
-  
-  .translation-form {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  
-  .input-container,
-  .output-container {
-    flex: 1;
-    position: relative;
-  }
-  
-  textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid rgba(221, 221, 221, 0.5);
-    border-radius: 8px;
-    font-size: 1rem;
-    font-family: 'Poppins', sans-serif;
-    resize: vertical;
-    background: rgba(255, 255, 255, 0.8); /* Glassmorphism effect */
-    backdrop-filter: blur(10px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-  }
-  
-  textarea:focus {
-    border-color: #4caf50;
-    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
-  }
-  
-  .output-text {
-    background: rgba(248, 249, 250, 0.8); /* Glassmorphism effect */
-  }
-  
-  .btn-speak {
-    position: absolute;
-    right: 10px;
-    bottom: 10px;
-    background: rgba(255, 255, 255, 0.9); /* Glassmorphism effect */
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    font-size: 1.5rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .btn-speak:hover {
-    transform: scale(1.1);
-    background: rgba(255, 255, 255, 1);
-  }
-  
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-  
-  .modal {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    max-width: 400px;
-    width: 100%;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.9); /* Glassmorphism effect */
-  }
-  
-  .modal-content {
-    text-align: center;
-  }
-  
-  .modal-close-btn {
-    margin-top: 20px;
-    padding: 10px 20px;
-    background: linear-gradient(135deg, #2c3e50, #1a252f);
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .modal-close-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  }
-  
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    h1 {
-      font-size: 2rem;
-    }
-  
-    p {
-      font-size: 1rem;
-    }
-  
-    .translation-form {
-      flex-direction: column;
-    }
-  
-    .btn-swap {
-      font-size: 0.875rem;
-    }
+    font-size: 2rem;
   }
 
-  .upgrade-message {
+  p {
+    font-size: 1rem;
+  }
+
+  .translation-form {
+    flex-direction: column;
+  }
+
+  .btn-swap {
+    font-size: 0.875rem;
+  }
+}
+
+.upgrade-message {
   text-align: center;
   margin-top: 20px;
 }
@@ -364,7 +364,7 @@ export default {
 
 .btn-upgrade {
   padding: 10px 20px;
-  background: linear-gradient(135deg, #ff5722, #e64a19);
+  background: linear-gradient(135deg, #6a11cb, #2575fc); /* Updated gradient */
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -377,4 +377,12 @@ export default {
   transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
-  </style>
+
+/* Character Counter */
+.char-counter {
+  text-align: right;
+  font-size: 0.875rem;
+  color: #666;
+  margin-top: 5px;
+}
+</style>

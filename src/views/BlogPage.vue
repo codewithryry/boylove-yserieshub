@@ -5,7 +5,8 @@
       <div class="row">
         <!-- Blog Posts -->
         <div class="col-lg-8">
-          <div v-for="post in blogPosts" :key="post.id" class="card mb-4 shadow-sm position-relative">
+          <!-- Display only visible posts -->
+          <div v-for="post in visiblePosts" :key="post.id" class="card mb-4 shadow-sm position-relative">
             <img v-if="post.image" :src="post.image" class="card-img-top" alt="Blog Post Image" />
             <div class="overlay">
               <!-- Show "Read More" button for non-VIP posts or VIP users -->
@@ -18,12 +19,12 @@
               </router-link>
               <!-- Show "Subscribe to VIP" button for VIP-only posts -->
               <router-link
-              v-else
-              :to="{ path: '/get-started', query: {subscription: 'vip' } }"
-              class="btn btn-warning"
-            >
-              Subscribe to VIP
-            </router-link>
+                v-else
+                :to="{ path: '/get-started', query: { subscription: 'vip' } }"
+                class="btn btn-warning"
+              >
+                Subscribe to VIP
+              </router-link>
             </div>
             <div class="card-body">
               <h2 class="card-title fw-bold">{{ post.title }}</h2>
@@ -47,6 +48,14 @@
               </div>
             </div>
           </div>
+          <!-- Load More Button -->
+          <div class="text-center mt-4" v-if="visiblePosts.length < blogPosts.length">
+  <button class="btn btn-load-more" @click="loadMore">
+    Load More
+  </button>
+</div>
+
+<br>
         </div>
 
         <!-- Sidebar -->
@@ -92,94 +101,22 @@
     </div>
   </div>
 </template>
-
-
-
-
-
-
-
-
-
-
-
-
 <script>
 import { db, auth } from "../firebase"; // Import Firestore and Auth
 import { doc, getDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
+import blogPosts from "@/assets/blogPage.json"; // Adjust the path as needed
 
 export default {
   name: 'BlogPage',
   data() {
     return {
       isVIP: false, // Track VIP subscription status
-      blogPosts: [
-  {
-    id: 1,
-    title: 'GMMTV Announces 2025 BL/GL Lineup',
-    author: 'Sportskeeda',
-    date: '2024-11-27',
-    excerpt: 'GMMTV has revealed its 2025 lineup of around 20 BL and GL dramas, set to release throughout next year. Premiere dates are yet to be confirmed.',
-    image: 'images/gmmtv-2025.png',
-    content: 'GMMTV has revealed its 2025 lineup of around 20 BL and GL dramas, set to release throughout next year. Premiere dates are yet to be confirmed. The lineup includes fan-favorite series like "Only Friends: Dream On" and "Dare You to Death," featuring popular CPs like Pond-Phuwin, Gemini-Fourth, and Earth-Mix. The genres range from romance to mystery and comedy, ensuring something for every fan.',
-    url: 'https://www.sportskeeda.com/us/k-pop/from-girl-rules-burnout-syndrome-gmmtv-reveals-2025-bl-gl-thai-drama-lineup',
-    vipOnly: false, // Available to all users
-  },
-  {
-    id: 2,
-    title: 'The Boy Next World: A Multiverse Love Story',
-    author: 'MyDramaList',
-    date: '2025-01-05',
-    excerpt: 'Starring Boss Chaikamon and Noeul Nuttarat, "The Boy Next World" explores a multiverse romance where two lovers reunite across parallel worlds. The series is set to premiere on January 5, 2025.',
-    image: 'images/the-boy-next-world.jpg',
-    content: 'Starring Boss Chaikamon and Noeul Nuttarat, "The Boy Next World" explores a multiverse romance where two lovers reunite across parallel worlds. The series is set to premiere on January 5, 2025. The show has already generated buzz for its unique storyline and stunning visuals, promising to be a standout in the 2025 BL lineup.',
-    url: 'https://mydramalist.com/747973-the-boy-next-world',
-    vipOnly: true, // VIP-only content
-  },
-  {
-    id: 3,
-    title: 'Boys in Love: A Fresh Take on BL Drama',
-    author: 'Lifestyle Asia India',
-    date: '2024-11-27',
-    excerpt: 'GMMTV’s "Boys in Love" introduces rookie actors Mick Metas and Luke Peemsan in a lighthearted romantic comedy. Directed by Waa Waasuthep, the drama is set to release in mid-2025 and promises a fresh perspective on BL storytelling.',
-    image: 'images/Boys.jpg',
-    content: 'GMMTV’s "Boys in Love" introduces rookie actors Mick Metas and Luke Peemsan in a lighthearted romantic comedy. Directed by Waa Waasuthep, the drama is set to release in mid-2025 and promises a fresh perspective on BL storytelling. The series follows two young men navigating love and friendship, offering a mix of humor and heartfelt moments.',
-    url: 'https://www.lifestyleasia.com/ind/entertainment/streaming/romantic-thai-dramas-releasing-in-2025/',
-    vipOnly: false, // Available to all users
-  },
-  {
-    id: 4,
-    title: 'Pit Babe Season 2: What to Expect',
-    author: 'The BL Xpress',
-    date: '2024-11-27',
-    excerpt: 'The highly anticipated second season of "Pit Babe" is set to release in 2025, with Pavel Naret and Pooh Krittin reprising their roles. Fans can expect more drama, romance, and high-speed action in this sequel.',
-    image: 'images/pit-babes2.jpg',
-    content: 'The highly anticipated second season of "Pit Babe" is set to release in 2025, with Pavel Naret and Pooh Krittin reprising their roles. Fans can expect more drama, romance, and high-speed action in this sequel. The first season left viewers on the edge of their seats, and the second season promises to deliver even more thrilling moments.',
-    url: 'https://theblxpress.wordpress.com/2024/11/27/gmmtv-lineup-2025-riding-the-wave/',
-    vipOnly: true, // VIP-only content
-  },
-  {
-    id: 5,
-    title: 'Ticket to Heaven: A Tale of Forbidden Love',
-    author: 'Vocal Media',
-    date: '2024-11-27',
-    excerpt: 'Gemini and Fourth star in "Ticket to Heaven," a BL drama that tackles themes of religion and forbidden love. The series is already generating buzz for its emotional depth and powerful performances.',
-    image: 'images/Ticket.jpeg',
-    content: 'Gemini and Fourth star in "Ticket to Heaven," a BL drama that tackles themes of religion and forbidden love. The series is already generating buzz for its emotional depth and powerful performances. The story follows two young men who must navigate societal expectations and their own feelings, creating a poignant and unforgettable narrative.',
-    url: 'https://vocal.media/humor/gmmtv-2025-your-guide-to-the-exciting-new-lineup',
-    vipOnly: false, // Available to all users
-  },
-],
-       
+      blogPosts: blogPosts, // Imported blog posts
+      visiblePosts: [], // Posts currently visible
+      postsPerLoad: 3, // Number of posts to load at a time
       categories: ['BL Dramas', 'GMMTV', 'New Releases', 'Romance', 'Mystery'],
-      recentPosts: [
-        { id: 1, title: 'GMMTV Announces 2025 BL/GL Lineup' },
-        { id: 2, title: 'The Boy Next World: A Multiverse Love Story' },
-        { id: 3, title: 'Boys in Love: A Fresh Take on BL Drama' },
-        { id: 4, title: 'Pit Babe Season 2: What to Expect' },
-        { id: 5, title: 'Ticket to Heaven: A Tale of Forbidden Love' },
-      ],
+      recentPosts: blogPosts.slice(0, 5).map(post => ({ id: post.id, title: post.title })), // Recent posts from blogPosts
     };
   },
   methods: {
@@ -200,6 +137,15 @@ export default {
         console.error("No user is currently logged in.");
       }
     },
+    loadMore() {
+      // Calculate the next set of posts to display
+      const nextPosts = this.blogPosts.slice(
+        this.visiblePosts.length,
+        this.visiblePosts.length + this.postsPerLoad
+      );
+      // Add the next posts to the visiblePosts array
+      this.visiblePosts = [...this.visiblePosts, ...nextPosts];
+    },
   },
   mounted() {
     onAuthStateChanged(auth, (user) => {
@@ -209,16 +155,12 @@ export default {
         this.isVIP = false; // Reset VIP status if the user logs out
       }
     });
+
+    // Initialize visible posts with the first set of posts
+    this.visiblePosts = this.blogPosts.slice(0, this.postsPerLoad);
   },
 };
 </script>
-
-
-
-
-
-
-
 
 
 
@@ -349,5 +291,30 @@ export default {
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
   }
+}
+
+
+.btn-load-more {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  border: none;
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 1rem;
+  font-weight: 600;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-load-more:hover {
+  background: linear-gradient(135deg, #2575fc, #6a11cb);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-load-more:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 </style>

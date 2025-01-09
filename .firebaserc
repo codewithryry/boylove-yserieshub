@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "blthai"
-  }
+    "production": "yserieshub",
+    "default": "yserieshub"
+  },
+  "targets": {},
+  "etags": {}
 }

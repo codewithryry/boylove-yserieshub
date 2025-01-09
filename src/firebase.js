@@ -10,15 +10,17 @@ import { getFirestore } from "firebase/firestore"; // Import Firestore
 import { signInWithEmailAndPassword } from "firebase/auth";
 
 
+
 // Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyAJ1YV9MuCeso7S_0LJbZzwEQEdUFPAiG8",
-  authDomain: "blthai.firebaseapp.com",
-  projectId: "blthai",
-  storageBucket: "blthai.firebasestorage.app",
-  messagingSenderId: "287103774767",
-  appId: "1:287103774767:web:53cac64a701af37e1c56da",
-  measurementId: "G-EW8V96GF7E",
+  apiKey: "AIzaSyBYvim_kVrJRrkdjiIsan_OXuQahOHM6KI",
+  authDomain: "yserieshub.firebaseapp.com",
+  projectId: "yserieshub",
+  storageBucket: "yserieshub.firebasestorage.app",
+  messagingSenderId: "384156684546",
+  appId: "1:384156684546:web:74c8ce20af12d2d050b21b",
+  measurementId: "G-CLHRWSLY67"
 };
 
 // Initialize Firebase
@@ -35,3 +37,6 @@ const googleProvider = new GoogleAuthProvider();
 
 // Export Firebase services
 export { auth, googleProvider, signInWithPopup, signOut, db }; // Export Firestore
+
+
+

@@ -1,0 +1,137 @@
+[
+    {
+      "id": 1,
+      "title": "Bad Buddy",
+      "image": "/images/bad-buddy.jpg",
+      "shortDescription": "A story of rivalry turned friendship and love.",
+      "synopsis": "Ever since they were young, Pran and Pat's families feuded...",
+      "cast": [
+        { "name": "Nanon Korapat", "role": "Pran" },
+        { "name": "Ohm Pawat", "role": "Pat" }
+      ],
+      "releaseDate": "October 29, 2021",
+      "genre": ["Romance", "Comedy", "Drama"],
+      "trailer": "https://www.youtube.com/embed/2uVHJN8S7X8",
+      "requiresPlan": false
+    },
+    {
+      "id": 2,
+      "title": "2gether: The Series",
+      "image": "/images/2gether.jpg",
+      "shortDescription": "A fake relationship turns into something real.",
+      "synopsis": "Tine is a popular college student who is pursued by...",
+      "cast": [
+        { "name": "Bright Vachirawit", "role": "Sarawat" },
+        { "name": "Win Metawin", "role": "Tine" }
+      ],
+      "releaseDate": "February 21, 2020",
+      "genre": ["Romance", "Comedy", "School"],
+      "trailer": "https://www.youtube.com/embed/6G3OXYtJQ1E",
+      "requiresPlan": false
+    },
+    {
+      "id": 3,
+      "title": "TharnType: The Series",
+      "image": "/images/tharntype.jpg",
+      "shortDescription": "A story of love and acceptance between two very different men.",
+      "synopsis": "Tharn, a gay man, and Type, a homophobic man, end up as roommates...",
+      "cast": [
+        { "name": "Gulf Kanawut", "role": "Type" },
+        { "name": "Mew Suppasit", "role": "Tharn" }
+      ],
+      "releaseDate": "November 7, 2019",
+      "genre": ["Romance", "Drama", "LGBTQ+"],
+      "trailer": "https://www.youtube.com/embed/5qap5aO4i9A",
+      "requiresPlan": false
+    },
+    {
+      "id": 4,
+      "title": "My School President",
+      "image": "/images/myschoolpresident.jpg",
+      "shortDescription": "A heartwarming tale of leadership, friendship, and young love.",
+      "synopsis": "Tinn, a diligent and responsible student, is elected as the school president...",
+      "cast": [
+        { "name": "Gemini Norawit", "role": "Tinn" },
+        { "name": "Fourth Nattawat", "role": "Gun" }
+      ],
+      "releaseDate": "December 2, 2022",
+      "genre": ["Drama", "Youth", "School Life"],
+      "trailer": "https://www.youtube.com/embed/xyz12345678",
+      "requiresPlan": false
+    },
+    {
+      "id": 5,
+      "title": "Fish upon the Sky",
+      "image": "/images/Fish-upon-the-Sky.jpg",
+      "shortDescription": "A lighthearted story of love and self-discovery.",
+      "synopsis": "Pi, a college student, navigates love and friendship while trying to win the heart of his crush, Mork.",
+      "cast": [
+        { "name": "Phuwin Tangsakyuen", "role": "Pi" },
+        { "name": "Pond Naravit", "role": "Mork" }
+      ],
+      "releaseDate": "April 9, 2021",
+      "genre": ["Romance", "Comedy", "Youth"],
+      "trailer": "https://www.youtube.com/embed/7X8II6J6u4w",
+      "requiresPlan": false
+    },
+    {
+      "id": 6,
+      "title": "A Tale of Thousand Stars",
+      "image": "/images/1000stars.jpg",
+      "shortDescription": "A heartwarming story of love and self-discovery in the mountains.",
+      "synopsis": "A city boy moves to a rural village and finds love and purpose.",
+      "cast": [
+        { "name": "Earth Pirapat", "role": "Phupha" },
+        { "name": "Mix Sahaphap", "role": "Tian" }
+      ],
+      "releaseDate": "January 29, 2021",
+      "genre": ["Romance", "Drama", "LGBTQ+"],
+      "trailer": "https://www.youtube.com/embed/8XZ9ZQZQZQZ",
+      "requiresPlan": true
+    },
+    {
+      "id": 7,
+      "title": "Love in the Air",
+      "image": "/images/love-in-the-air.png",
+      "shortDescription": "A steamy romance between a pilot and a flight attendant.",
+      "synopsis": "Prapai, a confident pilot, and Sky, a reserved flight attendant, find themselves drawn to each other despite their differences.",
+      "cast": [
+        { "name": "Boss Chaikamon", "role": "Prapai" },
+        { "name": "Noeul Nuttarat", "role": "Sky" }
+      ],
+      "releaseDate": "August 18, 2022",
+      "genre": ["Romance", "Drama", "LGBTQ+"],
+      "trailer": "https://www.youtube.com/embed/abc12345678",
+      "requiresPlan": true
+    },
+    {
+      "id": 13,
+      "title": "KinnPorsche: The Series",
+      "image": "/images/kinnporsche.jpg",
+      "shortDescription": "A mafia romance filled with danger, passion, and intrigue.",
+      "synopsis": "Kinn, a mafia heir, hires Porsche as his bodyguard. As they navigate the dangerous underworld, their relationship evolves into something deeper.",
+      "cast": [
+        { "name": "Mile Phakphum", "role": "Kinn" },
+        { "name": "Apo Nattawin", "role": "Porsche" }
+      ],
+      "releaseDate": "April 2, 2022",
+      "genre": ["Romance", "Action", "Drama"],
+      "trailer": "https://www.youtube.com/embed/abc12345678",
+      "requiresPlan": true
+    },
+    {
+      "id": 14,
+      "title": "Cutie Pie",
+      "image": "/images/cutie-pie.jpg",
+      "shortDescription": "A sweet and fluffy romance between two young men bound by an arranged marriage.",
+      "synopsis": "Lian and Kuea are engaged due to a family arrangement. As they spend time together, they discover genuine feelings for each other.",
+      "cast": [
+        { "name": "Zee Pruk", "role": "Lian" },
+        { "name": "NuNew Chawarin", "role": "Kuea" }
+      ],
+      "releaseDate": "February 18, 2022",
+      "genre": ["Romance", "Comedy", "Drama"],
+      "trailer": "https://www.youtube.com/embed/def12345678",
+      "requiresPlan": true
+    }
+  ]
