@@ -1,424 +1,310 @@
 <template>
-    <div class="app-container">
-      <div class="messenger-app">
-        <!-- Desktop Sidebar Section (Visible on desktop and when no chat is selected on mobile) -->
-        <div class="sidebar-section" v-if="!isChatSelected || !isMobileView">
-          <!-- User Profile -->
-          <div class="user-profile">
-            <div class="avatar">
-              <img v-if="photoURL" :src="photoURL" alt="Profile Picture" class="avatar-image" />
-              <span v-else>{{ currentUserId?.charAt(0)?.toUpperCase() }}</span>
-            </div>
-            <div class="user-info">
-              <div class="user-name">{{ displayName || 'You' }}</div>
-              <div class="user-id">{{ currentUserId }}</div>
-            </div>
+  <div class="app-container">
+    <div class="messenger-app">
+
+  
+      <!-- Desktop Sidebar Section -->
+      <div class="sidebar-section" v-if="!isChatSelected || !isMobileView">
+        <!-- User Profile -->
+        <div class="user-profile">
+          <div class="avatar">
+            <img v-if="photoURL" :src="photoURL" alt="Profile Picture" class="avatar-image" />
+            <span v-else>{{ currentUserId?.charAt(0)?.toUpperCase() }}</span>
           </div>
-  
-          <!-- Search Bar -->
-          <div class="search-bar">
-            <input
-              type="text"
-              placeholder="Start new chat"
-              v-model="searchQuery"
-              class="search-input"
-              aria-label="Search for chats"
-            />
-          </div>
-  
-          <!-- Chats List -->
-          <div class="chats-list">
-            <div
-              v-for="chat in recentChats"
-              :key="chat.userId"
-              class="chat-item"
-              :class="{ active: chat.userId === receiverId }"
-              @click="selectChat(chat.userId)"
-            >
-              <div class="chat-avatar">
-                <img v-if="chat.photoURL" :src="chat.photoURL" alt="Profile Picture" class="avatar-image" />
-                <span v-else>{{ chat.userId.charAt(0).toUpperCase() }}</span>
-              </div>
-              <div class="chat-info">
-                <div class="chat-name">{{ chat.displayName || `User ${chat.userId.slice(0, 6)}` }}</div>
-                <div class="chat-preview" v-if="!chat.isPrivate">
-                  {{ chat.hasConversation ? chat.lastMessage : "Hey! Let's be friends!" }}
-                </div>
-              </div>
-              <div class="chat-meta">
-                <div class="chat-time">{{ chat.lastMessageTime }}</div>
-              </div>
-            </div>
-  
-            <!-- Empty State for Chats List -->
-            <div v-if="recentChats.length === 0" class="empty-chats">
-              <div class="empty-icon">💬</div>
-              <p>No recent chats.</p>
-            </div>
+          <div class="user-info">
+            <div class="user-name">{{ displayName || 'You' }}</div>
+            <div class="user-id">{{ currentUserId }}</div>
           </div>
         </div>
-  
-        <!-- Mobile Sidebar Section (Visible only on mobile when no chat is selected) -->
-        <div class="mobile-sidebar-section" v-if="isMobileView && !isChatSelected">
-          <!-- User Profile -->
-          <div class="user-profile">
-            <div class="avatar">
-              <img v-if="photoURL" :src="photoURL" alt="Profile Picture" class="avatar-image" />
-              <span v-else>{{ currentUserId?.charAt(0)?.toUpperCase() }}</span>
-            </div>
-            <div class="user-info">
-              <div class="user-name">{{ displayName || 'You' }}</div>
-              <div class="user-id">{{ currentUserId }}</div>
-            </div>
-          </div>
-  
-          <!-- Search Bar -->
-          <div class="search-bar">
-            <input
-              type="text"
-              placeholder="Start new chat"
-              v-model="searchQuery"
-              class="search-input"
-              aria-label="Search for chats"
-            />
-          </div>
-  
-          <!-- Chats List -->
-          <div class="chats-list">
+
+        <!-- Search Bar -->
+        <div class="search-bar">
+          <input
+            type="text"
+            placeholder="Search by UID or name"
+            v-model="searchQuery"
+            class="search-input"
+            aria-label="Search for users"
+            @input="handleSearch"
+          />
+        </div>
+
+        <!-- Search Results -->
+        <div class="search-results" v-if="searchQuery">
+          <div v-if="searchResults.length > 0">
             <div
-              v-for="chat in recentChats"
-              :key="chat.userId"
-              class="chat-item"
-              :class="{ active: chat.userId === receiverId }"
-              @click="selectChat(chat.userId)"
+              v-for="user in searchResults"
+              :key="user.userId"
+              class="search-result-item"
+              @click="selectChat(user.userId)"
             >
               <div class="chat-avatar">
-                <img v-if="chat.photoURL" :src="chat.photoURL" alt="Profile Picture" class="avatar-image" />
-                <span v-else>{{ chat.userId.charAt(0).toUpperCase() }}</span>
+                <img v-if="user.photoURL" :src="user.photoURL" alt="Profile Picture" class="avatar-image" />
+                <span v-else>{{ user.userId.charAt(0).toUpperCase() }}</span>
               </div>
               <div class="chat-info">
-                <div class="chat-name">{{ chat.displayName || `User ${chat.userId.slice(0, 6)}` }}</div>
-                <div class="chat-preview" v-if="!chat.isPrivate">
-                  {{ chat.hasConversation ? chat.lastMessage : "Hey, what's up? Wanna chat?" }}
-                </div>
-              </div>
-              <div class="chat-meta">
-                <div class="chat-time">{{ chat.lastMessageTime }}</div>
+                <div class="chat-name">{{ user.displayName || `User ${user.userId.slice(0, 6)}` }}</div>
+                <div class="chat-preview">Start a conversation</div>
               </div>
             </div>
-  
-            <!-- Empty State for Chats List -->
-            <div v-if="recentChats.length === 0" class="empty-chats">
-              <div class="empty-icon">💬</div>
-              <p>No recent chats.</p>
-            </div>
+          </div>
+          <div v-else class="empty-search">
+            <p>No users found.</p>
           </div>
         </div>
-  
-        <!-- Chat Content Section (Visible when a chat is selected on mobile or desktop) -->
-        <div class="chat-content-section" v-if="isChatSelected || !isMobileView">
-          <!-- Chat Header -->
-          <div class="chat-header" v-if="receiverId">
-            <div class="header-content">
-              <!-- Chat Contact -->
-              <div class="chat-contact">
-                <div class="contact-avatar">
-                  <img v-if="receiverPhotoURL" :src="receiverPhotoURL" alt="Profile Picture" class="avatar-image" />
-                  <span v-else>{{ receiverId.charAt(0).toUpperCase() }}</span>
-                </div>
-                <div class="contact-info">
-                  <div class="contact-name">{{ receiverDisplayName || `User ${receiverId.slice(0, 6)}` }}</div>
-                  <div class="contact-status">
-                    <span :class="{ 'status-online': isReceiverValid }"></span>
-                    {{ isReceiverValid ? 'Online' : 'Offline' }}
-                  </div>
-                </div>
-              </div>
-  
-              <!-- Back Button on Mobile View -->
-              <button v-if="isMobileView" @click="goBackToSidebar" class="back-button">
-                <i class="fas fa-home"></i> <!-- Font Awesome home icon -->
-              </button>
+
+        <!-- Chats List -->
+        <div class="chats-list">
+          <div
+            v-for="chat in sortedRecentChats"
+            :key="chat.userId"
+            :class="['chat-item', { active: chat.userId === receiverId, unread: chat.unread }]"
+            @click="selectChat(chat.userId)"
+          >
+            <div class="chat-avatar">
+              <img v-if="chat.photoURL" :src="chat.photoURL" alt="Profile Picture" class="avatar-image" />
+              <span v-else>{{ chat.userId.charAt(0).toUpperCase() }}</span>
             </div>
-          </div>
-  
-          <!-- Messages Area -->
-          <div class="messages-area" ref="chatWindow" v-if="receiverId">
-            <!-- End-to-End Encryption Message -->
-            <div class="encryption-message">
-              <div class="encryption-notice">
-                <span class="encryption-info">Messages are secured with end-to-end encryption.</span>
+            <div class="chat-info">
+              <div class="chat-name">{{ chat.displayName || `User ${chat.userId.slice(0, 6)}` }}</div>
+              <div class="chat-preview" v-if="!chat.isPrivate">
+                {{ chat.hasConversation ? chat.lastMessage : "Hey! Let's be friends!" }}
               </div>
             </div>
-            <br>
-  
-            <!-- Messages -->
-            <div
-              v-for="message in filteredMessages"
-              :key="message.id"
-              class="message"
-              :class="{ 'message-sent': message.senderId === currentUserId }"
-            >
-              <div class="message-bubble">
-                {{ message.text }}
-                <span class="message-time">{{ formatTimestamp(message.timestamp) }}</span>
-              </div>
-            </div>
+            <div class="chat-meta">
+  <div class="chat-time">{{ formatLastMessageTime(chat.lastMessageTime) }}</div>
+</div>
           </div>
-  
-          <!-- Empty State -->
-          <div v-else class="empty-state">
-            <div class="empty-icon">💭</div>
-            <h3>Start a Conversation</h3>
-            <p>Select a chat or search for someone to message</p>
-          </div>
-  
-          <!-- Message Input -->
-          <div class="message-input" v-if="receiverId">
-            <input
-              v-model="newMessage"
-              @keyup.enter="sendMessage"
-              type="text"
-              placeholder="Type a message..."
-              :disabled="!isReceiverValid"
-            />
-            <button
-              @click="sendMessage"
-              class="send-button"
-              :disabled="!isReceiverValid || !newMessage.trim()"
-            >
-              Send
-            </button>
+
+          <!-- Empty State for Chats List -->
+          <div v-if="recentChats.length === 0" class="empty-chats">
+            <div class="empty-icon">💬</div>
+            <p>No recent chats.</p>
           </div>
         </div>
       </div>
+
+      <!-- Mobile Sidebar Section (Visible only on mobile when no chat is selected) -->
+      <div class="mobile-sidebar-section" v-if="isMobileView && !isChatSelected">
+        <!-- User Profile -->
+        <div class="user-profile">
+          <div class="avatar">
+            <img v-if="photoURL" :src="photoURL" alt="Profile Picture" class="avatar-image" />
+            <span v-else>{{ currentUserId?.charAt(0)?.toUpperCase() }}</span>
+          </div>
+          <div class="user-info">
+            <div class="user-name">{{ displayName || 'You' }}</div>
+            <div class="user-id">{{ currentUserId }}</div>
+          </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-bar">
+          <input
+            type="text"
+            placeholder="Search by UID or name"
+            v-model="searchQuery"
+            class="search-input"
+            aria-label="Search for users"
+            @input="handleSearch"
+          />
+        </div>
+
+        <!-- Search Results -->
+        <div class="search-results" v-if="searchQuery">
+          <div v-if="searchResults.length > 0">
+            <div
+              v-for="user in searchResults"
+              :key="user.userId"
+              class="search-result-item"
+              @click="selectChat(user.userId)"
+            >
+              <div class="chat-avatar">
+                <img v-if="user.photoURL" :src="user.photoURL" alt="Profile Picture" class="avatar-image" />
+                <span v-else>{{ user.userId.charAt(0).toUpperCase() }}</span>
+              </div>
+              <div class="chat-info">
+                <div class="chat-name">{{ user.displayName || `User ${user.userId.slice(0, 6)}` }}</div>
+                <div class="chat-preview">Start a conversation</div>
+              </div>
+            </div>
+          </div>
+
+          
+          <div v-else class="empty-search">
+            <p>No users found.</p>
+          </div>
+        </div>
+
+        <!-- Chats List -->
+        <div class="chats-list">
+          <div
+            v-for="chat in sortedRecentChats"
+            :key="chat.userId"
+            :class="['chat-item', { active: chat.userId === receiverId, unread: chat.unread }]"
+            @click="selectChat(chat.userId)"
+          >
+            <div class="chat-avatar">
+              <img v-if="chat.photoURL" :src="chat.photoURL" alt="Profile Picture" class="avatar-image" />
+              <span v-else>{{ chat.userId.charAt(0).toUpperCase() }}</span>
+            </div>
+            <div class="chat-info">
+              <div class="chat-name">{{ chat.displayName || `User ${chat.userId.slice(0, 6)}` }}</div>
+              <div class="chat-preview" v-if="!chat.isPrivate">
+                {{ chat.hasConversation ? chat.lastMessage : "Hey! Let's be friends!" }}
+              </div>
+            </div>
+            <div class="chat-meta">
+          <div class="chat-time">{{ formatLastMessageTime(chat.lastMessageTime) }}</div>
+        </div>
+          </div>
+          
+          <!-- Empty State for Chats List -->
+          <div v-if="recentChats.length === 0" class="empty-chats">
+            <div class="empty-icon">💬</div>
+            <p>No recent chats.</p>
+          </div>
+        </div>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+        <div class="development-banner">
+        <p>YChat is currently under development and may not work 100% as expected. Thank you for your patience!</p>
+      </div>
+      </div>
+      
+
+      <!-- Chat Content Section (Visible when a chat is selected on mobile or desktop) -->
+      <div class="chat-content-section" v-if="isChatSelected || !isMobileView">
+
+        
+        <!-- Chat Header -->
+        <div class="chat-header" v-if="receiverId">
+          <div class="header-content">
+            <!-- Chat Contact -->
+            <div class="chat-contact">
+              <div class="contact-avatar">
+                <img v-if="receiverPhotoURL" :src="receiverPhotoURL" alt="Profile Picture" class="avatar-image" />
+                <span v-else>{{ receiverId.charAt(0).toUpperCase() }}</span>
+              </div>
+              <div class="contact-info">
+                <div class="contact-name">{{ receiverDisplayName || `User ${receiverId.slice(0, 6)}` }}</div>
+                <div class="contact-status">
+                  <span :class="{ 'status-online': isReceiverValid }"></span>
+                  {{ isReceiverValid ? 'Online' : 'Offline' }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Back Button on Mobile View -->
+            <button v-if="isMobileView" @click="goBackToSidebar" class="back-button">
+              <i class="fas fa-home"></i> <!-- Font Awesome home icon -->
+            </button>
+          </div>
+        </div>
+
+        <!-- Messages Area -->
+        <div class="messages-area" ref="chatWindow" v-if="receiverId">
+          <!-- End-to-End Encryption Message -->
+          <div class="encryption-message">
+            <div class="encryption-notice">
+              <span class="encryption-info">Messages are secured with end-to-end encryption.</span>
+            </div>
+          </div>
+          <br>
+
+          <!-- Messages -->
+          <div
+            v-for="message in filteredMessages"
+            :key="message.id"
+            class="message"
+            :class="{ 'message-sent': message.senderId === currentUserId }"
+          >
+            <div class="message-bubble">
+              {{ message.text }}
+              <span class="message-time">{{ formatTimestamp(message.timestamp) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div v-else class="empty-state">
+          <div class="empty-icon">💭</div>
+          <h3>Start a Conversation</h3>
+          <p>Select a chat or search for someone to message</p>
+        </div>
+
+        <!-- Message Input -->
+        <div class="message-input" v-if="receiverId">
+          <input
+            v-model="newMessage"
+            @keyup.enter="sendMessage"
+            type="text"
+            placeholder="Type a message..."
+            :disabled="!isReceiverValid"
+          />
+          <button
+            @click="sendMessage"
+            class="send-button"
+            :disabled="!isReceiverValid || !newMessage.trim()"
+          >
+            <!-- Desktop: Show "Send" text -->
+            <span class="send-text">Send</span>
+            <!-- Mobile: Show send icon -->
+            <i class="fas fa-paper-plane send-icon"></i>
+          </button>
+        </div>
+        <div class="development-banner">
+        <p>YChat is currently under development and may not work 100% as expected. Thank you for your patience!</p>
+      </div>
+
+      </div>
+      
     </div>
-  </template>
-
-
+  </div>
+</template>
 <style scoped>
-/* Chat Header */
-.chat-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px;
-  background-color: #fff;
-  border-bottom: 1px solid #e9ecef;
+/* Under Development Banner */
+.development-banner {
+  background-color: #ffffff; /* Light yellow background */
+  color: #000000; /* Dark yellow text */
+  padding: 12px;
+  text-align: center;
+  font-size: 14px; /* Default font size */
+  font-weight: 500;
+
+  position: fixed; /* Fixed positioning */
+  bottom: 0; /* Stick to the bottom */
+  left: 0;
+  right: 0;
+  z-index: 1000; /* Ensure it stays on top */
 }
 
-
-encryption-message {
-  font-size: 12px;
-  color: #888;
-  margin-top: 5px;
+.development-banner p {
+  margin: 0;
 }
 
-.encryption-notice {
-  display: inline-block;
-  padding: 8px 16px;
- 
-  border-radius: 20px;
-  font-size: 12px;
-  color: #666;
-}
-
-
-.encryption-info {
-  color: #616161;
-}
-.header-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%; 
-}
-.back-button {
-  background: none;
-  border: none;
-  font-size: 24px; /* Larger size for the icon */
-  cursor: pointer;
-  margin-left: 10px; /* Move to the right */
-  color: #2c3e50; /* Darker color for better visibility */
-  font-weight: 500; /* Slightly bold */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px; /* Fixed width for better alignment */
-  height: 40px; /* Fixed height for better alignment */
-  border-radius: 50%; /* Circular button */
-  transition: background-color 0.3s ease; /* Smooth hover effect */
-}
-
-.back-button:hover {
-  background-color: #f0f2f5; /* Light background on hover */
-  color: #1a73e8; /* Change color on hover for better interaction feedback */
-}
-</style>
-
-
-<style scoped>
-
-.mobile-sidebar-section {
-  display: none; /* Hidden by default */
-  width: 100%;
-  height: 100%;
-  background-color: #f8f9fa;
-  overflow-y: auto;
-}
-
-/* Show Mobile Sidebar Section on mobile */
+/* Mobile Styles */
 @media (max-width: 768px) {
-  .mobile-sidebar-section {
-    display: block; /* Show on mobile */
+  .development-banner {
+    font-size: 12px; /* Smaller font size for mobile */
+    padding: 8px; /* Reduce padding for mobile */
   }
 
-  .sidebar-section {
-    display: none; /* Hide desktop sidebar on mobile */
-  }
-}
-
-
-/* Container to center the app and give it a box-like appearance */
-.app-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: #f0f2f5; /* Background color for the entire page */
-  padding: 20px; /* Add some padding around the app */
-}
-
-/* Messenger app styles */
-.messenger-app {
-  width: 100%;
-  max-width: 1200px; /* Set a max-width for the app */
-  height: 90vh; /* Set a fixed height for the app */
-  background-color: white; /* Background color for the app */
-  border-radius: 12px; /* Rounded corners */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
-  overflow: hidden; /* Ensure content doesn't overflow */
-  display: flex;
-}
-
-/* Sidebar Section */
-.sidebar-section {
-  width: 300px;
-  background-color: #f8f9fa;
-  border-right: 1px solid #e9ecef;
-  overflow-y: auto;
-}
-
-/* Chat Content Section */
-.chat-content-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-/* Chat Header */
-.chat-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px;
-  background-color: #fff;
-  border-bottom: 1px solid #e9ecef;
-}
-
-/* Messages Area */
-.messages-area {
-  flex: 1;
-  padding: 10px;
-  overflow-y: auto;
-}
-
-/* Message Input */
-.message-input {
-  display: flex;
-  padding: 10px;
-  background-color: #fff;
-  border-top: 1px solid #e9ecef;
-}
-
-.message-input input {
-  flex: 1;
-  padding: 10px;
-  border: 1px solid #e9ecef;
-  border-radius: 8px;
-  margin-right: 10px;
-}
-
-.message-input button {
-  padding: 10px 20px;
-  background-color: #2c3e50;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.message-input button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
-/* Back Button for Mobile */
-.back-button {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  margin-right: 10px;
-}
-
-/* Responsive Design for Mobile */
-@media (max-width: 768px) {
-  .app-container {
-    padding: 0; /* Remove padding for full-width layout */
-  }
-
+  /* Adjust the messenger-app container to account for the banner */
   .messenger-app {
-    height: 100vh; /* Full height */
-    border-radius: 0; /* Remove border radius */
-    flex-direction: column; /* Stack sidebar and chat content vertically */
-  }
-
-  .sidebar-section {
-    width: 100%; /* Full width */
-    border-right: none; /* Remove border */
-    border-bottom: 1px solid #e9ecef; /* Add bottom border */
-    flex: 0 0 40%; /* Fixed height for sidebar */
-    overflow-y: auto; /* Allow scrolling */
-  }
-
-  .chat-content-section {
-    flex: 1; /* Allow chat content to take up remaining space */
-  }
-
-  .mobile-hidden {
-    display: none; /* Hide sidebar or chat content based on visibility */
-  }
-
-  .empty-state {
-    display: none; /* Hide empty state on mobile */
-  }
-
-  .message-input {
-    position: fixed; /* Fix message input at the bottom */
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 10px;
-    background-color: #fff;
-    border-top: 1px solid #e9ecef;
+    padding-bottom: 60px; /* Add padding to avoid overlap with the banner */
   }
 }
 </style>
+
 <script>
 import { db, auth } from "../firebase";
-import { collection, addDoc, serverTimestamp, onSnapshot, query, orderBy, doc, getDoc } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, onSnapshot, query, orderBy, doc, getDoc, where, getDocs } from "firebase/firestore";
 import { debounce } from 'lodash';
 
 export default {
@@ -437,10 +323,12 @@ export default {
       photoURL: '',
       receiverDisplayName: '',
       receiverPhotoURL: '',
-      isChatSelected: false, // Track if a chat is selected
+      isChatSelected: false,
+      searchResults: [], // New property to store search results
     };
   },
   computed: {
+    // Filter messages for the selected chat
     filteredMessages() {
       return this.messages.filter(
         (message) =>
@@ -448,8 +336,15 @@ export default {
           (message.senderId === this.receiverId && message.receiverId === this.currentUserId)
       );
     },
+    // Sort chats by last message time (most recent first)
+    sortedRecentChats() {
+      return this.recentChats.slice().sort((a, b) => {
+        return new Date(b.lastMessageTime) - new Date(a.lastMessageTime);
+      });
+    },
   },
   methods: {
+    // Send a new message
     async sendMessage() {
       if (this.newMessage.trim() === '' || !this.receiverId || !this.isReceiverValid) return;
 
@@ -470,11 +365,23 @@ export default {
         this.$toast.error("Failed to send message. Please try again.");
       }
     },
+    // Format timestamp for display
     formatTimestamp(timestamp) {
       if (!timestamp) return '';
       const date = timestamp.toDate();
       return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     },
+    // Format last message time dynamically
+    formatLastMessageTime(timestamp) {
+      if (!timestamp) return '';
+
+      // Convert Firestore Timestamp to Date if necessary
+      const date = timestamp instanceof Date ? timestamp : timestamp.toDate();
+
+      // Format the time (e.g., "10:30 AM")
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    },
+    // Scroll to the bottom of the chat window
     scrollToBottom() {
       setTimeout(() => {
         const chatWindow = this.$refs.chatWindow;
@@ -483,6 +390,7 @@ export default {
         }
       }, 50);
     },
+    // Check if the receiver exists in the database
     async checkReceiverExists() {
       if (this.receiverId) {
         try {
@@ -507,18 +415,29 @@ export default {
         this.receiverPhotoURL = '';
       }
     },
+    // Select a chat and mark it as read
     async selectChat(userId) {
       this.receiverId = userId;
       this.isChatSelected = true; // Show chat content on mobile
+      this.searchQuery = ''; // Clear search query after selecting a chat
+      this.searchResults = []; // Clear search results
       await this.checkReceiverExists();
+
+      // Mark the chat as read
+      const chat = this.recentChats.find(chat => chat.userId === userId);
+      if (chat) {
+        chat.unread = false;
+      }
     },
+    // Go back to the sidebar on mobile
     goBackToSidebar() {
       this.isChatSelected = false; // Show sidebar on mobile
       this.receiverId = ''; // Clear the selected chat
     },
+    // Update recent chats when a new message is sent or received
     async updateRecentChats(userId, message) {
       const existingChat = this.recentChats.find(chat => chat.userId === userId);
-      const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const now = new Date();
 
       const { displayName, photoURL } = await this.getUserProfile(userId);
 
@@ -530,25 +449,27 @@ export default {
       );
 
       if (existingChat) {
-        // Only update the last message if there are mutual messages
-        if (hasMutualMessages) {
-          existingChat.lastMessage = message;
-          existingChat.lastMessageTime = now;
+        // Update the last message and time
+        existingChat.lastMessage = message;
+        existingChat.lastMessageTime = now; // Update the timestamp to the current time
+        // Mark as unread if the message is received (not sent by the current user)
+        if (this.messages.some(msg => msg.senderId === userId && msg.receiverId === this.currentUserId)) {
+          existingChat.unread = true;
         }
-        existingChat.displayName = displayName || `User ${userId.slice(0, 6)}`;
-        existingChat.photoURL = photoURL || '';
-        existingChat.hasConversation = hasMutualMessages; // Mark as having a conversation
       } else {
+        // Add a new chat to the list
         this.recentChats.unshift({
           userId,
-          lastMessage: hasMutualMessages ? message : '', // Only set last message if mutual messages exist
-          lastMessageTime: hasMutualMessages ? now : '', // Only set time if mutual messages exist
+          lastMessage: message,
+          lastMessageTime: now, // Set the timestamp to the current time
           displayName: displayName || `User ${userId.slice(0, 6)}`,
           photoURL: photoURL || '',
-          hasConversation: hasMutualMessages, // Mark as having a conversation if mutual messages exist
+          hasConversation: hasMutualMessages,
+          unread: true, // Mark as unread for new messages
         });
       }
     },
+    // Fetch user profile (displayName and photoURL)
     async getUserProfile(userId) {
       try {
         const userDoc = await getDoc(doc(db, "users", userId));
@@ -563,29 +484,103 @@ export default {
       }
       return { displayName: null, photoURL: null };
     },
+    // Handle search for users by UID or displayName
+    handleSearch: debounce(async function () {
+      if (this.searchQuery.trim() === '') {
+        this.searchResults = [];
+        return;
+      }
+
+      try {
+        const usersRef = collection(db, "users");
+
+        // Query for UID
+        const uidQuery = query(
+          usersRef,
+          where("userId", ">=", this.searchQuery),
+          where("userId", "<=", this.searchQuery + "\uf8ff")
+        );
+
+        // Query for displayName
+        const nameQuery = query(
+          usersRef,
+          where("displayName", ">=", this.searchQuery),
+          where("displayName", "<=", this.searchQuery + "\uf8ff")
+        );
+
+        // Execute both queries
+        const [uidSnapshot, nameSnapshot] = await Promise.all([
+          getDocs(uidQuery),
+          getDocs(nameQuery),
+        ]);
+
+        // Combine results and remove duplicates
+        const combinedResults = [...uidSnapshot.docs, ...nameSnapshot.docs];
+        const uniqueResults = Array.from(new Set(combinedResults.map(doc => doc.id)))
+          .map(id => {
+            const doc = combinedResults.find(doc => doc.id === id);
+            return {
+              userId: doc.id,
+              displayName: doc.data().displayName,
+              photoURL: doc.data().photoURL,
+            };
+          });
+
+        this.searchResults = uniqueResults;
+      } catch (error) {
+        console.error("Error searching users:", error);
+        this.$toast.error("Failed to search users. Please try again.");
+      }
+    }, 300), // Debounce for 300ms
+    // Check if the view is mobile
     checkMobileView() {
       this.isMobileView = window.innerWidth <= 768;
     },
+    // Handle window resize (debounced)
     handleResize: debounce(function () {
       this.checkMobileView();
     }, 200),
   },
   watch: {
+    // Scroll to the bottom when filtered messages change
     filteredMessages() {
       this.scrollToBottom();
     },
+    // Check if the receiver exists when receiverId changes
     receiverId() {
       this.checkReceiverExists();
     },
+    // Re-sort the chat list when messages change
+    messages() {
+      this.recentChats.forEach(chat => {
+        // Find the last message in the chat
+        const lastMessage = this.messages
+          .filter(
+            msg =>
+              (msg.senderId === this.currentUserId && msg.receiverId === chat.userId) ||
+              (msg.senderId === chat.userId && msg.receiverId === this.currentUserId)
+          )
+          .sort((a, b) => b.timestamp - a.timestamp)[0]; // Sort by timestamp and get the latest message
+
+        // Update the lastMessageTime for the chat
+        if (lastMessage) {
+          chat.lastMessageTime = lastMessage.timestamp;
+        }
+      });
+    },
   },
   mounted() {
+    // Check if the view is mobile
     this.checkMobileView();
+
+    // Listen for authentication state changes
     auth.onAuthStateChanged((user) => {
       if (user) {
         this.currentUserId = user.uid;
         this.displayName = user.displayName || 'You';
         this.photoURL = user.photoURL || '';
 
+        // Fetch messages from Firestore
         const messagesRef = collection(db, "yChatMessages");
         const q = query(messagesRef, orderBy("timestamp", "asc"));
 
@@ -595,6 +590,7 @@ export default {
             ...doc.data(),
           }));
 
+          // Update recent chats with unique users
           const uniqueUsers = new Set();
           [...this.messages].reverse().forEach(message => {
             const otherUser = message.senderId === this.currentUserId ? message.receiverId : message.senderId;
@@ -607,9 +603,11 @@ export default {
       }
     });
 
+    // Listen for window resize events
     window.addEventListener('resize', this.handleResize);
   },
   beforeDestroy() {
+    // Remove the window resize event listener
     window.removeEventListener('resize', this.handleResize);
   },
 };
@@ -618,138 +616,46 @@ export default {
 
 
 <style scoped>
-/* Back Button */
-.back-button {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  margin-right: 10px;
-}
-
-/* Mobile Layout */
-@media (max-width: 768px) {
-  .sidebar-section {
-    display: block; /* Show sidebar by default */
-  }
-
-  .chat-content-section {
-    display: none; /* Hide chat content by default */
-  }
-
-  .chat-content-section.active {
-    display: block; /* Show chat content when a chat is selected */
-  }
-}
-</style>
-
-
- <style scoped>
-.sidebar-toggle {
-  display: none; /* Hide by default */
-  background: none;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-  margin-right: 10px;
-}
-
-/* Show the toggle button only on mobile */
-@media (max-width: 768px) {
-  .sidebar-toggle {
-    display: block;
-  }
-}
-
-.notification-badge {
-  background-color: red;
-  color: white;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
+/* Messenger App Container */
+.app-container {
   display: flex;
-  align-items: center;
   justify-content: center;
-  font-size: 12px;
-  margin-left: 8px;
-}
-
-
-.messenger-app {
-  display: flex;
-  height: 100vh;
+  align-items: center;
+  min-height: 100vh;
   background-color: #f0f2f5;
+  padding: 20px;
 }
 
-.main-container {
-  display: flex;
+/* Messenger App Styles */
+.messenger-app {
   width: 100%;
-  height: 100%;
-  position: relative;
-}
-
-/* Sidebar Toggle Button */
-.sidebar-toggle {
-  display: none; /* Hidden by default */
-  position: fixed;
-  top: 10px;
-  left: 10px;
-  z-index: 1001;
-  background: #42b983;
-  color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 50%;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: 1200px;
+  height: 90vh;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
 }
 
 /* Sidebar Section */
 .sidebar-section {
-  width: 350px;
+  width: 300px;
+  background-color: #f8f9fa;
+  border-right: 1px solid #e9ecef;
+  overflow-y: auto;
+}
+
+/* Mobile Sidebar Section */
+.mobile-sidebar-section {
+  display: none;
+  width: 100%;
   height: 100%;
-  background: white;
-  border-right: 1px solid #e0e0e0;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  flex-shrink: 0;
-  transition: transform 0.3s ease;
+  background-color: #f8f9fa;
+  overflow-y: auto;
 }
 
-/* Chat Content Section */
-.chat-content-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  background: #f8f9fa;
-  height: 100%;
-}
-
-/* Mobile Styles */
-@media (max-width: 768px) {
-  .sidebar-toggle {
-    display: block; /* Show toggle button on mobile */
-  }
-
-  .sidebar-section {
-    position: fixed;
-    left: -350px;
-    top: 0;
-    bottom: 0;
-    z-index: 1000;
-    transition: left 0.3s ease;
-  }
-
-  .sidebar-section.sidebar-mobile {
-    left: 0; /* Show sidebar when toggled */
-  }
-
-  .chat-content-section {
-    width: 100%;
-  }
-}
-
+/* User Profile */
 .user-profile {
   display: flex;
   align-items: center;
@@ -758,81 +664,6 @@ export default {
   border-bottom: 1px solid #e0e0e0;
 }
 
-
-.messenger-app {
-  display: flex;
-  height: 100vh;
-  background-color: #f0f2f5;
-}
-
-.main-container {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
-
-/* Sidebar Toggle Button */
-.sidebar-toggle {
-  display: none; /* Hidden by default */
-  position: fixed;
-  top: 10px;
-  left: 10px;
-  z-index: 1001;
-  background: #42b983;
-  color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 50%;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Sidebar Section */
-.sidebar-section {
-  width: 350px;
-  height: 100%;
-  background: white;
-  border-right: 1px solid #e0e0e0;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  flex-shrink: 0;
-  transition: transform 0.3s ease;
-}
-
-/* Chat Content Section */
-.chat-content-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  background: #f8f9fa;
-  height: 100%;
-}
-
-/* Mobile Styles */
-@media (max-width: 768px) {
-  .sidebar-toggle {
-    display: block; /* Show toggle button on mobile */
-  }
-
-  .sidebar-section {
-    position: fixed;
-    left: -350px;
-    top: 0;
-    bottom: 0;
-    z-index: 1000;
-    transition: left 0.3s ease;
-  }
-
-  .sidebar-section.sidebar-mobile {
-    left: 0; /* Show sidebar when toggled */
-  }
-
-  .chat-content-section {
-    width: 100%;
-  }
-}
 .avatar {
   width: 45px;
   height: 45px;
@@ -845,14 +676,855 @@ export default {
   font-weight: bold;
   margin-right: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  overflow: hidden; /* Ensure the image fits inside the circle */
+  overflow: hidden;
 }
 
 .avatar-image {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Ensure the image covers the avatar area */
+  object-fit: cover;
 }
+
+.user-info {
+  flex: 1;
+  text-align: left;
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #2d3748;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-id {
+  font-size: 0.85rem;
+  color: #718096;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Search Bar */
+.search-bar {
+  padding: 16px;
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8f9fa;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #42b983;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(66, 185, 131, 0.1);
+}
+
+/* Search Results */
+.search-results {
+  margin-top: 10px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.search-result-item:hover {
+  background-color: #f0f2f5;
+}
+
+.search-result-item .chat-avatar {
+  margin-right: 10px;
+}
+
+.search-result-item .chat-info {
+  flex: 1;
+}
+
+.search-result-item .chat-name {
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.search-result-item .chat-preview {
+  font-size: 12px;
+  color: #666;
+}
+
+/* Chats List */
+.chats-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.chat-item {
+  display: flex;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  align-items: center;
+  border-left: 3px solid transparent;
+}
+
+.chat-item:hover {
+  background: #f8f9fa;
+}
+
+.chat-item.active {
+  background: #e8f5fe;
+  border-left-color: #42b983;
+}
+
+.chat-avatar {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #42b983, #2f855a);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.chat-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-name {
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 4px;
+}
+
+.chat-preview {
+  font-size: 0.9rem;
+  color: #718096;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat-meta {
+  text-align: right;
+  margin-left: 8px;
+}
+
+.chat-time {
+  font-size: 0.75rem;
+  color: #718096;
+  white-space: nowrap;
+}
+
+/* Chat Content Section */
+.chat-content-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #f8f9fa;
+}
+
+/* Chat Header */
+.chat-header {
+  padding: 16px 20px;
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+}
+
+.chat-contact {
+  display: flex;
+  align-items: center;
+}
+
+.contact-avatar {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #42b983, #2f855a);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  margin-right: 12px;
+}
+
+.contact-info {
+  flex: 1;
+}
+
+.contact-name {
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 2px;
+}
+
+.contact-status {
+  font-size: 0.85rem;
+  color: #718096;
+  display: flex;
+  align-items: center;
+}
+
+.status-online {
+  width: 8px;
+  height: 8px;
+  background: #42b983;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+/* Messages Area */
+.messages-area {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* End-to-End Encryption Message */
+.encryption-message {
+  font-size: 12px;
+  color: #888;
+  margin-top: 5px;
+}
+
+.encryption-notice {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #f1f1f1;
+  border-radius: 20px;
+}
+
+.encryption-info {
+  color: #616161;
+}
+
+/* Messages */
+.message {
+  margin-bottom: 12px;
+  display: flex;
+}
+
+.message-sent {
+  justify-content: flex-end;
+}
+
+.message-bubble {
+  max-width: 60%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+.message-sent .message-bubble {
+  background: #dcf8c6;
+}
+
+.message-time {
+  font-size: 0.75rem;
+  color: #718096;
+  margin-left: 8px;
+}
+
+/* Empty State */
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #718096;
+  background: #f8f9fa;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+/* Message Input */
+.message-input {
+  display: flex;
+  padding: 10px;
+  background-color: #fff;
+  border-top: 1px solid #e9ecef;
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.message-input input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  margin-right: 10px;
+  font-size: 14px;
+}
+
+.message-input button {
+  padding: 10px 20px;
+  background-color: #2c3e50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.message-input button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Send Text and Icon */
+.send-text {
+  display: inline;
+}
+
+.send-icon {
+  display: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+</style>
+
+<style>
+/* Messages */
+.message {
+  margin-bottom: 12px;
+  display: flex;
+}
+
+.message-sent {
+  justify-content: flex-end;
+}
+
+.message-bubble {
+  max-width: 60%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+.message-sent .message-bubble {
+  background: #dcf8c6;
+}
+
+.message-time {
+  font-size: 0.75rem;
+  color: #718096;
+  margin-left: 8px;
+}
+
+/* Empty State */
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #718096;
+  background: #f8f9fa;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+/* Message Input */
+.message-input {
+  display: flex;
+  padding: 10px;
+  background-color: #fff;
+  border-top: 1px solid #e9ecef;
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.message-input input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  margin-right: 10px;
+  font-size: 14px;
+}
+
+.message-input button {
+  padding: 10px 20px;
+  background-color: #fafafa;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.message-input button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Send Text and Icon */
+.send-text {
+  display: inline;
+}
+
+.send-icon {
+  display: none;
+}
+</style>
+
+
+<style>
+ /* Mobile Styles */
+ @media (max-width: 768px) {
+   .sidebar-section {
+     position: absolute;
+     left: -350px;
+     top: 0;
+     bottom: 0;
+     z-index: 1000;
+     transition: left 0.3s ease;
+   }
+ 
+   .sidebar-section.sidebar-mobile {
+     left: 0;
+   }
+ 
+   .chat-content-section {
+     width: 100%;
+   }
+ }
+
+</style>
+
+
+<style scoped>
+/* Messenger App Container */
+.app-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f0f2f5;
+  padding: 20px;
+}
+
+/* Messenger App Styles */
+.messenger-app {
+  width: 100%;
+  max-width: 1200px;
+  height: 90vh;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+}
+
+/* Sidebar Section */
+.sidebar-section {
+  width: 300px;
+  background-color: #f8f9fa;
+  border-right: 1px solid #e9ecef;
+  overflow-y: auto;
+}
+
+/* Mobile Sidebar Section */
+.mobile-sidebar-section {
+  display: none;
+  width: 100%;
+  height: 100%;
+  background-color: #f8f9fa;
+  overflow-y: auto;
+}
+
+/* User Profile */
+.user-profile {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #42b983, #2f855a);
+  color: white;
+  font-weight: bold;
+  margin-right: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-info {
+  flex: 1;
+  text-align: left;
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #2d3748;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-id {
+  font-size: 0.85rem;
+  color: #718096;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Search Bar */
+.search-bar {
+  padding: 16px;
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8f9fa;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #42b983;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(66, 185, 131, 0.1);
+}
+
+/* Search Results */
+.search-results {
+  margin-top: 10px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.search-result-item:hover {
+  background-color: #f0f2f5;
+}
+
+.search-result-item .chat-avatar {
+  margin-right: 10px;
+}
+
+.search-result-item .chat-info {
+  flex: 1;
+}
+
+.search-result-item .chat-name {
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.search-result-item .chat-preview {
+  font-size: 12px;
+  color: #666;
+}
+
+/* Chats List */
+.chats-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.chat-item {
+  display: flex;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  align-items: center;
+  border-left: 3px solid transparent;
+}
+
+.chat-item:hover {
+  background: #f8f9fa;
+}
+
+.chat-item.active {
+  background: #e8f5fe;
+  border-left-color: #42b983;
+}
+
+.chat-avatar {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #42b983, #2f855a);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.chat-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-name {
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 4px;
+}
+
+.chat-preview {
+  font-size: 0.9rem;
+  color: #718096;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat-meta {
+  text-align: right;
+  margin-left: 8px;
+}
+
+.chat-time {
+  font-size: 0.75rem;
+  color: #718096;
+  white-space: nowrap;
+}
+
+
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .mobile-sidebar-section {
+    display: block;
+  }
+
+  .sidebar-section {
+    display: none;
+  }
+
+  .message-input {
+  display: flex;
+  padding: 10px;
+  background-color: #fff;
+  border-top: 1px solid #e9ecef;
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.message-input input {
+    flex: 1;
+    padding: 8px 12px; /* Reduced padding */
+    border: 1px solid #e0e0e0;
+    border-radius: 16px; /* Smaller border radius */
+    font-size: 14px; /* Smaller font size */
+    background-color: #ffffff;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+  .message-input input:focus {
+    outline: none;
+    border-color: #000000;
+    box-shadow: 0 0 0 3px rgba(66, 185, 131, 0.1);
+  }
+
+  .message-input button {
+    padding: 12px;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2950ff, #284fff);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .message-input button:hover {
+    background: linear-gradient(135deg, #2950ff, #284fff);
+    transform: translateY(-1px);
+  }
+
+  .message-input button:disabled {
+    background: #cbd5e0;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .send-text {
+    display: none;
+  }
+
+  /* Messenger-like send icon */
+  .send-icon {
+    display: inline-block;
+    font-size: 20px;
+    color: white;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+    transform: rotate(18deg); /* Tilt the icon slightly to the right */
+  }
+}
+
+
+
+
+</style>
+
+
+
+
+
+
+
+
+
+
+
+<style scoped>
+.search-results {
+  margin-top: 10px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.search-result-item:hover {
+  background-color: #f0f2f5;
+}
+
+.search-result-item .chat-avatar {
+  margin-right: 10px;
+}
+
+.search-result-item .chat-info {
+  flex: 1;
+}
+
+.search-result-item .chat-name {
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.search-result-item .chat-preview {
+  font-size: 12px;
+  color: #666;
+}
+</style>
+
+
+ <style scoped>
+
+
+
 
 .user-info {
   flex: 1;
@@ -1032,25 +1704,6 @@ export default {
    border-bottom: 1px solid #e0e0e0;
  }
  
- .search-input {
-   width: 100%;
-   padding: 12px 16px;
-   border: 1px solid #e2e8f0;
-   border-radius: 8px;
-   background: #f8f9fa;
-   font-size: 0.95rem;
-   transition: all 0.3s ease;
- }
- 
-
-
- .search-input:focus {
-   outline: none;
-   border-color: #42b983;
-   background: white;
-   box-shadow: 0 0 0 3px rgba(66, 185, 131, 0.1);
- }
- 
  .chats-list {
    flex: 1;
    overflow-y: auto;
@@ -1088,80 +1741,6 @@ export default {
    flex-shrink: 0;
  }
  
- .chat-info {
-   flex: 1;
-   min-width: 0;
- }
- 
- .chat-name {
-   font-weight: 600;
-   color: #2d3748;
-   margin-bottom: 4px;
- }
- 
- .chat-preview {
-   font-size: 0.9rem;
-   color: #718096;
-   white-space: nowrap;
-   overflow: hidden;
-   text-overflow: ellipsis;
- }
- 
- .chat-meta {
-   text-align: right;
-   margin-left: 8px;
- }
- 
- .chat-time {
-   font-size: 0.75rem;
-   color: #718096;
-   white-space: nowrap;
- }
- 
- /* Chat Content Section */
- .chat-content-section {
-   flex: 1;
-   display: flex;
-   flex-direction: column;
-   background: #f8f9fa;
- }
- 
- .chat-header {
-   padding: 16px 20px;
-   background: white;
-   border-bottom: 1px solid #e0e0e0;
-   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-   display: flex;
-   align-items: center;
- }
- 
- .chat-contact {
-   display: flex;
-   align-items: center;
- }
- 
- .contact-avatar {
-   width: 40px;
-   height: 40px;
-   background: linear-gradient(135deg, #42b983, #2f855a);
-   border-radius: 50%;
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   color: white;
-   font-weight: bold;
-   margin-right: 12px;
- }
- 
- .contact-info {
-   flex: 1;
- }
- 
- .contact-name {
-   font-weight: 600;
-   color: #2d3748;
-   margin-bottom: 2px;
- }
  
  .contact-status {
    font-size: 0.85rem;
@@ -1178,119 +1757,36 @@ export default {
    margin-right: 6px;
  }
  
- .messages-area {
-   flex: 1;
-   padding: 20px;
-   overflow-y: auto;
- }
- 
- .message {
-   margin-bottom: 12px;
-   display: flex;
- }
- 
- .message-sent {
-   justify-content: flex-end;
- }
- 
- .message-bubble {
-   max-width: 60%;
-   padding: 12px 16px;
-   border-radius: 16px;
-   background: white;
-   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-   position: relative;
- }
- 
- .message-sent .message-bubble {
-   background: #dcf8c6;
- }
- 
- .message-time {
-   font-size: 0.75rem;
-   color: #718096;
-   margin-left: 8px;
- }
- 
- .empty-state {
-   flex: 1;
-   display: flex;
-   flex-direction: column;
-   align-items: center;
-   justify-content: center;
-   color: #718096;
-   background: #f8f9fa;
- }
- 
- .empty-icon {
-   font-size: 48px;
-   margin-bottom: 16px;
- }
- 
- .message-input {
-   padding: 16px 20px;
-   background: white;
-   border-top: 1px solid #e0e0e0;
-   display: flex;
-   gap: 12px;
- }
- 
- .message-input input {
-   flex: 1;
-   padding: 12px 16px;
-   border: 1px solid #e2e8f0;
-   border-radius: 24px;
-   background: #f8f9fa;
-   font-size: 0.95rem;
-   transition: all 0.3s ease;
- }
- 
- .message-input input:focus {
-   outline: none;
-   border-color: #42b983;
-   background: white;
-   box-shadow: 0 0 0 3px rgba(66, 185, 131, 0.1);
- }
- 
- .send-button {
-   padding: 8px 24px;
-   background: linear-gradient(135deg, #42b983, #2f855a);
-   color: white;
-   border: none;
-   border-radius: 24px;
-   cursor: pointer;
-   transition: all 0.3s ease;
-   font-weight: 500;
- }
- 
- .send-button:hover {
-   background: linear-gradient(135deg, #3aa876, #2a7a4f);
-   transform: translateY(-1px);
- }
- 
- .send-button:disabled {
-   background: #cbd5e0;
-   cursor: not-allowed;
-   transform: none;
- }
- 
- /* Mobile Styles */
- @media (max-width: 768px) {
-   .sidebar-section {
-     position: absolute;
-     left: -350px;
-     top: 0;
-     bottom: 0;
-     z-index: 1000;
-     transition: left 0.3s ease;
-   }
- 
-   .sidebar-section.sidebar-mobile {
-     left: 0;
-   }
- 
-   .chat-content-section {
-     width: 100%;
-   }
- }
+
  </style>
+<style>
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%; 
+}
+
+.back-button {
+  background: none;
+  border: none;
+  font-size: 24px; /* Larger size for the icon */
+  cursor: pointer;
+  margin-left: 10px; /* Move to the right */
+  color: #2c3e50; /* Darker color for better visibility */
+  font-weight: 500; /* Slightly bold */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; /* Fixed width for better alignment */
+  height: 40px; /* Fixed height for better alignment */
+  border-radius: 50%; /* Circular button */
+  transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+.back-button:hover {
+  background-color: #f0f2f5; /* Light background on hover */
+  color: #1a73e8; /* Change color on hover for better interaction feedback */
+}
+
+</style>

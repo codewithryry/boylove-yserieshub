@@ -1,69 +1,21 @@
 <template>
-    <div class="songs" :style="dynamicBackground">
-      <h1 class="songs-title">Original Soundtracks (Ost)</h1>
-      <p class="songs-subtitle">Explore the amazing soundtracks from your favorite Thai BL series!</p>
-  
-      <!-- Search Bar -->
-      <div class="search-bar">
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="Search for a song..."
-          class="search-input"
-        />
-      </div>
-  
-      <!-- Featured Playlist -->
-      <div class="featured-playlist" v-if="featuredSongs.length > 0">
-        <h2>Featured Playlist</h2>
-        <div class="song-list">
-  <div
-    class="song-card"
-    v-for="(song, index) in visibleSongs"
-    :key="index"
-    @mouseenter="setDynamicBackground(song.color)"
-  >
-    <!-- YouTube Embed -->
-    <div class="youtube-embed">
-      <iframe
-        width="100%"
-        height="200"
-        :src="`https://www.youtube.com/embed/${song.youtubeId}`"
-        title="YouTube video player"
-        frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen
-      ></iframe>
+  <div class="songs" :style="dynamicBackground">
+    <h1 class="songs-title">Original Soundtracks (Ost)</h1>
+    <p class="songs-subtitle">Explore the amazing soundtracks from your favorite Thai BL series!</p>
 
-      <div v-if="song.premium && !userHasAccess" class="premium-overlay" @click="upgradeToPremium">
-  <p>This is a premium song. Upgrade for exclusive benefits!</p>
-  <button class="btn-upgrade">Upgrade to Premium</button>
-</div>
-
+    <!-- Search Bar -->
+    <div class="search-bar">
+      <input
+        v-model="searchQuery"
+        type="text"
+        placeholder="Search for a song..."
+        class="search-input"
+      />
     </div>
 
-    <div class="song-details">
-  <h3>{{ song.title }}</h3> <!-- Song Title -->
-  <p>{{ song.artist }}</p> <!-- Artist Name -->
-  <div class="song-stats">
-    <span class="play-count">
-      <i class="fas fa-play"></i> {{ song.playCount }} plays
-    </span>
-    <button class="like-button" @click="toggleLike(song)">
-      <i :class="['fas', 'fa-heart', { liked: song.liked }]"></i>
-      {{ song.likes }}
-    </button>
-    <button class="share-button" @click="shareSong(song)">
-      <i class="fas fa-share"></i> Share
-    </button>
-  </div>
-</div>
-    </div>
-  </div>
-
-
-</div>
-      <!-- Song List -->
+    <!-- Featured Playlist -->
+    <div class="featured-playlist" v-if="featuredSongs.length > 0">
+      <h2>Featured Playlist</h2>
       <div class="song-list">
         <div
           class="song-card"
@@ -71,52 +23,165 @@
           :key="index"
           @mouseenter="setDynamicBackground(song.color)"
         >
-        <div class="youtube-embed">
-  <iframe
-    width="100%"
-    height="200"
-    :src="`https://www.youtube.com/embed/${song.youtubeId}`"
-    title="YouTube video player"
-    frameborder="0"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowfullscreen
-  ></iframe>
+          <!-- YouTube Embed -->
+          <div class="youtube-embed">
+            <iframe
+              width="100%"
+              height="200"
+              :src="`https://www.youtube.com/embed/${song.youtubeId}`"
+              title="YouTube video player"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            ></iframe>
 
-  <!-- Premium Overlay for Non-Premium Users -->
-  <div v-if="song.premium && !userHasAccess" class="premium-overlay" @click="upgradeToPremium">
-  <p>This is a premium song. Upgrade for exclusive benefits!</p>
-  <button class="btn-upgrade">Upgrade to Premium</button>
-</div>
-</div>
+            <!-- Premium Overlay -->
+            <div v-if="song.premium && !userHasAccess" class="premium-overlay" @click="upgradeToPremium">
+              <p>This is a premium song. Upgrade for exclusive benefits!</p>
+              <button class="btn-upgrade">Upgrade to Premium</button>
+            </div>
+          </div>
 
-
-
-<div class="song-details">
-  <h3>{{ song.title }}</h3> <!-- Song Title -->
-  <p>{{ song.artist }}</p> <!-- Artist Name -->
-  <div class="song-stats">
-    <span class="play-count">
-      <i class="fas fa-play"></i> {{ song.playCount }} plays
-    </span>
-    <button class="like-button" @click="toggleLike(song)">
-      <i :class="['fas', 'fa-heart', { liked: song.liked }]"></i>
-      {{ song.likes }}
-    </button>
-    <button class="share-button" @click="shareSong(song)">
-      <i class="fas fa-share"></i> Share
-    </button>
-  </div>
-</div>
+          <!-- Song Details -->
+          <div class="song-details">
+            <h3>{{ song.title }}</h3>
+            <p>{{ song.artist }}</p>
+            <div class="song-stats">
+              <span class="play-count">
+                <i class="fas fa-play"></i> {{ song.playCount }} plays
+              </span>
+              <button class="like-button" @click="toggleLike(song)">
+                <i :class="['fas', 'fa-heart', { liked: song.liked }]"></i>
+                {{ song.likes }}
+              </button>
+              <button class="share-button" @click="shareSong(song)">
+                <i class="fas fa-share"></i> Share
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-  
-      <!-- Load More Button -->
-      <div class="load-more" v-if="visibleSongs.length < filteredSongs.length">
-        <button @click="loadMore" class="btn-load-more">Load More</button>
-      </div>
-    
     </div>
-  </template>
+
+    <!-- Song List -->
+    <div class="song-list">
+      <div
+        class="song-card"
+        v-for="(song, index) in visibleSongs"
+        :key="index"
+        @mouseenter="setDynamicBackground(song.color)"
+      >
+        <!-- YouTube Embed -->
+        <div class="youtube-embed">
+          <iframe
+            width="100%"
+            height="200"
+            :src="`https://www.youtube.com/embed/${song.youtubeId}`"
+            title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+
+          <!-- Premium Overlay -->
+          <div v-if="song.premium && !userHasAccess" class="premium-overlay" @click="upgradeToPremium">
+            <p>This is a premium song. Upgrade for exclusive benefits!</p>
+            <button class="btn-upgrade">Upgrade to Premium</button>
+          </div>
+        </div>
+
+        <!-- Song Details -->
+        <div class="song-details">
+          <h3>{{ song.title }}</h3>
+          <p>{{ song.artist }}</p>
+          <div class="song-stats">
+            <span class="play-count">
+              <i class="fas fa-play"></i> {{ song.playCount }} plays
+            </span>
+            <button class="like-button" @click="toggleLike(song)">
+              <i :class="['fas', 'fa-heart', { liked: song.liked }]"></i>
+              {{ song.likes }}
+            </button>
+            <button class="share-button" @click="shareSong(song)">
+              <i class="fas fa-share"></i> Share
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Load More Button -->
+    <div class="load-more" v-if="visibleSongs.length < filteredSongs.length">
+      <button @click="loadMore" class="btn-load-more">Load More</button>
+    </div>
+
+    <!-- Back to Top Button -->
+    <button
+      v-if="showBackToTop"
+      @click="scrollToTop"
+      class="btn btn-primary back-to-top"
+      :class="{ visible: showBackToTop }"
+    >
+      <i class="fas fa-arrow-up"></i>
+    </button>
+  </div>
+
+</template>
+
+
+<style scoped>
+/* Existing styles... */
+
+/* Back to Top Button */
+.back-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  border: none;
+  color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.back-to-top:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.back-to-top:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .back-to-top {
+    bottom: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+  }
+}
+</style>
+
+
+
+
   
   <script>
   import { auth, db } from '../firebase'; // Import Firebase auth and Firestore
@@ -135,7 +200,7 @@
         dynamicBackground: {
           background: 'linear-gradient(135deg, #f8f9fa, #e9ecef)',
         },
-        showBackToTop: false,
+        showBackToTop: false, // Controls visibility of the "Back to Top" button
       };
     },
     computed: {
@@ -186,19 +251,21 @@
         this.dynamicBackground.background = `linear-gradient(135deg, ${color}, #e9ecef)`;
       },
       handleScroll() {
-        this.showBackToTop = window.scrollY > 300;
+        this.showBackToTop = window.scrollY > 300; // Show button if scrolled more than 300px
+      },
+      scrollToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' }); // Smooth scroll to top
       },
     },
     mounted() {
       this.checkUserSubscription();
-      window.addEventListener('scroll', this.handleScroll);
+      window.addEventListener('scroll', this.handleScroll); // Add scroll event listener
     },
     beforeDestroy() {
-      window.removeEventListener('scroll', this.handleScroll);
+      window.removeEventListener('scroll', this.handleScroll); // Clean up the event listener
     },
   };
   </script>
-
 
 
 

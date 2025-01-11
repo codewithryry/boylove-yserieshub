@@ -59,9 +59,9 @@
     </div>
   </div>
 </template>
-
 <script>
-import { db } from "../firebase"; // Import Firestore
+import { auth, db } from "../firebase"; // Import Firebase auth and Firestore
+import { onAuthStateChanged } from "firebase/auth";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 export default {
@@ -77,7 +77,18 @@ export default {
       errorMessage: '', // Error message for user feedback
       successMessage: '', // Success message for user feedback
       showSuccessModal: false, // Control success modal visibility
+      user: null, // Logged-in user
     };
+  },
+  async created() {
+    // Listen for authentication state changes
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        this.user = user; // Set the logged-in user
+      } else {
+        this.user = null; // Reset if the user is not logged in
+      }
+    });
   },
   methods: {
     async submitForm() {
@@ -97,6 +108,7 @@ export default {
           name: this.formData.name,
           email: this.formData.email,
           message: this.formData.message,
+          uid: this.user ? this.user.uid : null, // Include the user's UID if logged in
           timestamp: serverTimestamp(), // Add a timestamp
         });
 
@@ -114,6 +126,7 @@ export default {
   },
 };
 </script>
+
 
 <style scoped>
 /* Modern Font */

@@ -7,7 +7,14 @@
         <div class="col-lg-8">
           <!-- Display only visible posts -->
           <div v-for="post in visiblePosts" :key="post.id" class="card mb-4 shadow-sm position-relative">
-            <img v-if="post.image" :src="post.image" class="card-img-top" alt="Blog Post Image" />
+            <img
+              v-if="post.image"
+              :src="post.image"
+              class="card-img-top"
+              alt="Blog Post Image"
+              @load="imageLoaded(post.id)"
+              :class="{ 'loading': !post.imageLoaded }"
+            />
             <div class="overlay">
               <!-- Show "Read More" button for non-VIP posts or VIP users -->
               <router-link
@@ -50,16 +57,16 @@
           </div>
           <!-- Load More Button -->
           <div class="text-center mt-4" v-if="visiblePosts.length < blogPosts.length">
-  <button class="btn btn-load-more" @click="loadMore">
-    Load More
-  </button>
-</div>
-
-<br>
+            <button class="btn btn-load-more" @click="loadMore" :disabled="isLoading">
+              <span v-if="!isLoading">Load More</span>
+              <span v-else>Loading...</span>
+            </button>
+          </div>
+          <br>
         </div>
 
         <!-- Sidebar -->
-        <div class="col-lg-4">
+        <div class="col-lg-4 d-none d-lg-block">
           <!-- Categories -->
           <div class="card shadow-sm mb-4">
             <div class="card-body">
@@ -99,8 +106,18 @@
         </div>
       </div>
     </div>
+
+    <!-- Back to Top Button -->
+    <button
+      v-if="showBackToTop"
+      @click="scrollToTop"
+      class="btn btn-primary back-to-top"
+    >
+      <i class="fas fa-arrow-up"></i>
+    </button>
   </div>
 </template>
+
 <script>
 import { db, auth } from "../firebase"; // Import Firestore and Auth
 import { doc, getDoc } from "firebase/firestore";
@@ -111,58 +128,72 @@ export default {
   name: 'BlogPage',
   data() {
     return {
-      isVIP: false, // Track VIP subscription status
-      blogPosts: blogPosts, // Imported blog posts
-      visiblePosts: [], // Posts currently visible
-      postsPerLoad: 3, // Number of posts to load at a time
+      isVIP: false,
+      blogPosts: blogPosts.map(post => ({ ...post, imageLoaded: false })),
+      visiblePosts: [],
+      postsPerLoad: 3,
       categories: ['BL Dramas', 'GMMTV', 'New Releases', 'Romance', 'Mystery'],
-      recentPosts: blogPosts.slice(0, 5).map(post => ({ id: post.id, title: post.title })), // Recent posts from blogPosts
+      recentPosts: blogPosts.slice(0, 5).map(post => ({ id: post.id, title: post.title })),
+      isLoading: false,
+      showBackToTop: false,
     };
   },
   methods: {
     async checkUserSubscription() {
+      this.isLoading = true;
       const user = auth.currentUser;
       if (user) {
         const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists()) {
           const userData = userDoc.data();
-          console.log("User data:", userData);
-          console.log("User subscription:", userData.subscription);
-          // Ensure this matches the value in Firestore
-          this.isVIP = userData.subscription === "vip plan"; // Use the exact value from Firestore
+          this.isVIP = userData.subscription === "vip"; // Use the exact value from Firestore
         } else {
           console.error("User document does not exist.");
         }
       } else {
         console.error("No user is currently logged in.");
       }
+      this.isLoading = false;
     },
     loadMore() {
-      // Calculate the next set of posts to display
+      this.isLoading = true;
       const nextPosts = this.blogPosts.slice(
         this.visiblePosts.length,
         this.visiblePosts.length + this.postsPerLoad
       );
-      // Add the next posts to the visiblePosts array
       this.visiblePosts = [...this.visiblePosts, ...nextPosts];
+      this.isLoading = false;
+    },
+    imageLoaded(postId) {
+      const post = this.blogPosts.find(post => post.id === postId);
+      if (post) {
+        post.imageLoaded = true;
+      }
+    },
+    handleScroll() {
+      this.showBackToTop = window.scrollY > 300;
+    },
+    scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     },
   },
   mounted() {
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        this.checkUserSubscription(); // Check the user's subscription status when the component mounts
+        this.checkUserSubscription();
       } else {
-        this.isVIP = false; // Reset VIP status if the user logs out
+        this.isVIP = false;
       }
     });
 
-    // Initialize visible posts with the first set of posts
     this.visiblePosts = this.blogPosts.slice(0, this.postsPerLoad);
+    window.addEventListener('scroll', this.handleScroll);
+  },
+  beforeUnmount() {
+    window.removeEventListener('scroll', this.handleScroll);
   },
 };
 </script>
-
-
 
 <style scoped>
 /* Modern Font */
@@ -293,7 +324,6 @@ export default {
   }
 }
 
-
 .btn-load-more {
   padding: 10px 20px;
   background: linear-gradient(135deg, #6a11cb, #2575fc);
@@ -316,5 +346,24 @@ export default {
 .btn-load-more:active {
   transform: translateY(0);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.back-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card-img-top.loading {
+  background: #f0f0f0;
+  min-height: 250px;
 }
 </style>

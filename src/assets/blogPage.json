@@ -30,7 +30,7 @@
       "image": "images/Boys.jpg",
       "content": "GMMTV’s \"Boys in Love\" introduces rookie actors Mick Metas and Luke Peemsan in a lighthearted romantic comedy. Directed by Waa Waasuthep, the drama is set to release in mid-2025 and promises a fresh perspective on BL storytelling. The series follows two young men navigating love and friendship, offering a mix of humor and heartfelt moments.",
       "url": "https://www.lifestyleasia.com/ind/entertainment/streaming/romantic-thai-dramas-releasing-in-2025/",
-      "vipOnly": false
+      "vipOnly": true
     },
     {
       "id": 4,
@@ -38,7 +38,7 @@
       "author": "The BL Xpress",
       "date": "2024-11-27",
       "excerpt": "The highly anticipated second season of \"Pit Babe\" is set to release in 2025, with Pavel Naret and Pooh Krittin reprising their roles. Fans can expect more drama, romance, and high-speed action in this sequel.",
-      "image": "images/pit-babes2.jpg",
+      "image": "images/Pit-babes2.jpg",
       "content": "The highly anticipated second season of \"Pit Babe\" is set to release in 2025, with Pavel Naret and Pooh Krittin reprising their roles. Fans can expect more drama, romance, and high-speed action in this sequel. The first season left viewers on the edge of their seats, and the second season promises to deliver even more thrilling moments.",
       "url": "https://theblxpress.wordpress.com/2024/11/27/gmmtv-lineup-2025-riding-the-wave/",
       "vipOnly": true
@@ -52,6 +52,6 @@
       "image": "images/Ticket.jpeg",
       "content": "Gemini and Fourth star in \"Ticket to Heaven,\" a BL drama that tackles themes of religion and forbidden love. The series is already generating buzz for its emotional depth and powerful performances. The story follows two young men who must navigate societal expectations and their own feelings, creating a poignant and unforgettable narrative.",
       "url": "https://vocal.media/humor/gmmtv-2025-your-guide-to-the-exciting-new-lineup",
-      "vipOnly": false
+      "vipOnly": true
     }
   ]

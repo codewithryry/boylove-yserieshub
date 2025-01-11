@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { auth } from '../firebase'; // Import Firebase auth
+import { auth, db } from '../firebase'; // Import Firebase auth and Firestore
+import { onAuthStateChanged } from 'firebase/auth'; // Import onAuthStateChanged
+import { doc, getDoc } from 'firebase/firestore'; // For Firestore queries
 
 const routes = [
   // Define all routes with lazy loading and meta titles
@@ -59,8 +61,20 @@ const routes = [
   {
     path: '/ychat',
     name: 'YChat',
-    component: () => import('../views/YChat.vue'), // Add YChat route
-    meta: { requiresAuth: true, title: 'YChat | YSeriesHub' }, // Restrict to logged-in users
+    component: () => import('../views/YChat.vue'),
+    meta: { requiresAuth: true, title: 'YChat | YSeriesHub' },
+  },
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: () => import('../views/Admin.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true, title: 'Admin | YSeriesHub' }, // Admin route
+  },
+  {
+    path: '/blocked',
+    name: 'Blocked',
+    component: () => import('../views/Blocked.vue'),
+    meta: { title: 'Access Denied | YSeriesHub' },
   },
   {
     path: '/:pathMatch(.*)*',
@@ -75,30 +89,53 @@ const router = createRouter({
   routes,
 });
 
-// Navigation Guard for Authentication and Page Titles
 router.beforeEach(async (to, from, next) => {
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+  const requiresAdmin = to.matched.some((record) => record.meta.requiresAdmin);
   const requiresGuest = to.matched.some((record) => record.meta.requiresGuest);
 
-  // Get the current user
+  // Set the page title
+  const title = to.meta.title || 'YSeriesHub'; // Fallback title
+  document.title = title;
+
+  // Wait for Firebase auth to initialize and get the current user
   const currentUser = await new Promise((resolve) => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      unsubscribe(); // Unsubscribe to avoid memory leaks
       resolve(user);
-      unsubscribe(); // Unsubscribe after resolving
     });
   });
 
-  // Set the page title
-  const title = to.meta.title || 'My App'; // Fallback title (you can change this to whatever you want)
-  document.title = title;
-
   // Handle authentication
   if (requiresAuth && !currentUser) {
-    next('/login');
+    next('/Login'); // Block unauthenticated users
   } else if (requiresGuest && currentUser) {
-    next('/profile');
+    next('/blocked'); // Block authenticated users trying to access guest routes
+  } else if (requiresAdmin) {
+    // Check if the user is an admin
+    if (currentUser) {
+      try {
+        const userDoc = await getDoc(doc(db, 'users', currentUser.uid)); // Fetch user document from Firestore
+
+        // Debugging logs
+        console.log('Current user:', currentUser);
+        console.log('User document:', userDoc?.data());
+        console.log('User role:', userDoc?.data()?.role);
+
+        if (userDoc.exists() && userDoc.data().role === 'admin') {
+          next(); // Allow access to the Admin page
+        } else {
+          next('/blocked'); // Block non-admin users
+        }
+      } catch (error) {
+        console.error('Error checking admin status:', error);
+        next('/blocked'); // Block in case of an error
+      }
+    } else {
+      next('/blocked'); // Block unauthenticated users trying to access admin routes
+    }
   } else {
-    next();
+    next(); // Allow access to non-protected routes
   }
 });
 

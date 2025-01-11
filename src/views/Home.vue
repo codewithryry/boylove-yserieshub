@@ -2,7 +2,7 @@
   <div class="home" @mousemove="onUserActivity" @click="onUserActivity">
     <!-- Video Background -->
     <video ref="videoPlayer" autoplay muted loop playsinline class="video-background">
-      <source src="/images/home.mp4" type="video/mp4" />
+      <source :src="videoSource" type="video/mp4" />
       <img src="/images/fallback-image.jpg" alt="Fallback Image" />
       Your browser does not support the video tag.
     </video>
@@ -24,20 +24,34 @@ export default {
   data() {
     return {
       inactivityTimer: null, // Timer for resuming video playback
+      isMobile: false, // Track if the device is mobile
     };
   },
+  computed: {
+    // Dynamically set the video source based on screen size
+    videoSource() {
+      return this.isMobile ? '/images/home-move-bg.mp4' : '/images/home.mp4';
+    },
+  },
   mounted() {
+    // Check if the device is mobile on mount
+    this.checkIfMobile();
+
     // Start playing the video when the component is mounted
     this.playVideo();
 
     // Set up event listeners for user activity
     window.addEventListener('mousemove', this.onUserActivity);
     window.addEventListener('click', this.onUserActivity);
+
+    // Update the video source on window resize
+    window.addEventListener('resize', this.checkIfMobile);
   },
   beforeUnmount() {
     // Clean up event listeners when the component is destroyed
     window.removeEventListener('mousemove', this.onUserActivity);
     window.removeEventListener('click', this.onUserActivity);
+    window.removeEventListener('resize', this.checkIfMobile);
 
     // Clear any existing timers
     if (this.inactivityTimer) {
@@ -75,6 +89,10 @@ export default {
       this.inactivityTimer = setTimeout(() => {
         this.playVideo();
       }, 3000);
+    },
+    checkIfMobile() {
+      // Update the isMobile flag based on screen width
+      this.isMobile = window.innerWidth <= 768; // Adjust the breakpoint as needed
     },
   },
 };

@@ -266,49 +266,47 @@ export default {
   line-height: 1.6; /* Adjust line height for better readability */
   color: #4a5568;
 }
-
-.blog-content >>> img {
+.blog-content :deep(img) {
   max-width: 100%;
   height: auto;
   border-radius: 8px;
   margin: 1rem 0;
 }
 
-.blog-content >>> h2 {
+.blog-content :deep(h2) {
   font-size: 1.5rem; /* Smaller heading size for mobile */
   margin-top: 1.5rem;
   margin-bottom: 1rem;
   color: #2c3e50;
 }
 
-.blog-content >>> h3 {
+.blog-content :deep(h3) {
   font-size: 1.25rem; /* Smaller heading size for mobile */
   margin-top: 1.25rem;
   margin-bottom: 0.75rem;
   color: #2c3e50;
 }
 
-.blog-content >>> p {
+.blog-content :deep(p) {
   margin-bottom: 1rem;
 }
 
-.blog-content >>> ul {
+.blog-content :deep(ul) {
   margin-bottom: 1rem;
   padding-left: 1.25rem; /* Adjust padding for mobile */
 }
 
-.blog-content >>> ul li {
+.blog-content :deep(ul li) {
   margin-bottom: 0.5rem;
 }
 
-.blog-content >>> blockquote {
+.blog-content :deep(blockquote) {
   border-left: 4px solid #42b983;
   padding-left: 1rem;
   margin: 1.5rem 0;
   color: #555;
 }
-
-.blog-content >>> blockquote footer {
+.blog-content :deep(blockquote footer) {
   font-size: 0.875rem;
   color: #777;
 }

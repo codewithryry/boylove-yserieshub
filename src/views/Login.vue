@@ -141,8 +141,6 @@
 
 
 
-
-
 <script>
 import { auth, googleProvider, signInWithPopup, signOut, db } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
@@ -152,46 +150,73 @@ export default {
   data() {
     return {
       user: null,
+      isAdmin: false, // Add a flag to track admin status
     };
   },
   methods: {
     async handleGoogleLogin() {
-      try {
-        const result = await signInWithPopup(auth, googleProvider);
-        this.user = result.user;
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    this.user = result.user;
 
-        // Save user data to Firestore
-        await this.saveUserToFirestore(this.user);
+    // Save user data to Firestore
+    await this.saveUserToFirestore(this.user);
 
-        // Redirect to the home page after successful login
-        this.$router.push("/");
-      } catch (error) {
-        console.error("Error during Google login:", error.message);
-        alert("Login failed: " + error.message);
-      }
-    },
+    // Check if the user is an admin
+    await this.checkIfAdmin(this.user.uid);
+
+    // Redirect based on admin status
+    if (this.isAdmin) {
+      this.$router.push("/"); // Redirect to admin dashboard
+    } else {
+      this.$router.push("/"); // Redirect to home page for regular users
+    }
+  } catch (error) {
+    console.error("Error during Google login:", error.message);
+    alert("Login failed: " + error.message); // Fallback for toast notification
+  }
+},
     async saveUserToFirestore(user) {
-      const userRef = doc(db, "users", user.uid); // Reference to the user's document
-      const userDoc = await getDoc(userRef);
+  const userRef = doc(db, "users", user.uid); // Reference to the user's document
+  const userDoc = await getDoc(userRef);
 
-      // If the user document doesn't exist, create it
-      if (!userDoc.exists()) {
-        await setDoc(userRef, {
-          uid: user.uid,
-          displayName: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL,
-          createdAt: new Date(), // Add a timestamp
-        });
-        console.log("User data saved to Firestore!");
-      } else {
-        console.log("User already exists in Firestore.");
+  // If the user document doesn't exist, create it with a default role of "user"
+  if (!userDoc.exists()) {
+    await setDoc(userRef, {
+      uid: user.uid,
+      displayName: user.displayName,
+      email: user.email,
+      photoURL: user.photoURL,
+      createdAt: new Date(), // Add a timestamp
+      role: "user", // Set default role as "user"
+    });
+    console.log("User data saved to Firestore with default role 'user'!");
+  } else {
+    console.log("User already exists in Firestore.");
+  }
+},
+    async checkIfAdmin(uid) {
+      try {
+        const userRef = doc(db, "users", uid); // Reference to the user's document
+        const userDoc = await getDoc(userRef);
+
+        if (userDoc.exists() && userDoc.data().role === "admin") {
+          this.isAdmin = true; // User is an admin
+          console.log("User is an admin.");
+        } else {
+          this.isAdmin = false; // User is not an admin
+          console.log("User is not an admin.");
+        }
+      } catch (error) {
+        console.error("Error checking admin status:", error.message);
+        this.isAdmin = false; // Default to non-admin on error
       }
     },
     async handleLogout() {
       try {
         await signOut(auth);
         this.user = null;
+        this.isAdmin = false; // Reset admin status on logout
       } catch (error) {
         console.error("Error during logout:", error.message);
       }
@@ -200,10 +225,16 @@ export default {
   mounted() {
     onAuthStateChanged(auth, (user) => {
       this.user = user;
+      if (user) {
+        this.checkIfAdmin(user.uid); // Check admin status on page load
+      }
     });
   },
 };
 </script>
+
+
+
 <style scoped>
 /* Custom styles for a modern look */
 nav {

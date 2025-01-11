@@ -9,6 +9,7 @@
         <div v-for="(bl, index) in visibleItems" :key="index" class="col-md-4 mb-4">
           <div class="card h-100">
             <div class="card-image">
+              <!-- Use require if images are in src/assets -->
               <img :src="bl.image" class="card-img-top" :alt="bl.title" @click="goToSeriesDetail(bl.id)">
               <div class="overlay">
                 <!-- Show "Buy Plan" button if the series requires a plan and the user doesn't have one -->
@@ -42,14 +43,18 @@
         <button class="btn btn-load-more" @click="loadMore">Load More</button>
       </div>
     </div>
+
+    <!-- Back to Top Button -->
+    <button
+      v-if="showBackToTop"
+      @click="scrollToTop"
+      class="btn btn-primary back-to-top"
+      :class="{ visible: showBackToTop }"
+    >
+      <i class="fas fa-arrow-up"></i>
+    </button>
   </div>
 </template>
-
-
-
-
-
-
 
 <script>
 import { auth } from "../firebase";
@@ -65,6 +70,7 @@ export default {
       blList: recommendations, // Use the imported JSON data
       visibleItems: [], // Items currently visible
       itemsPerLoad: 6, // Number of items to load at a time
+      showBackToTop: false, // Controls visibility of the "Back to Top" button
     };
   },
   methods: {
@@ -98,6 +104,12 @@ export default {
       // Add the next items to the visibleItems array
       this.visibleItems = [...this.visibleItems, ...nextItems];
     },
+    handleScroll() {
+      this.showBackToTop = window.scrollY > 300; // Show button if scrolled more than 300px
+    },
+    scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' }); // Smooth scroll to top
+    },
   },
   created() {
     onAuthStateChanged(auth, (user) => {
@@ -111,10 +123,65 @@ export default {
     // Initialize visible items with the first set of items
     this.visibleItems = this.blList.slice(0, this.itemsPerLoad);
   },
+  mounted() {
+    window.addEventListener('scroll', this.handleScroll); // Add scroll event listener
+  },
+  beforeDestroy() {
+    window.removeEventListener('scroll', this.handleScroll); // Clean up the event listener
+  },
 };
 </script>
 
 
+<style scoped>
+/* Existing styles... */
+
+/* Back to Top Button */
+.back-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  border: none;
+  color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.back-to-top:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.back-to-top:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .back-to-top {
+    bottom: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+  }
+}
+</style>
 
 
 

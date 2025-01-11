@@ -31,13 +31,29 @@
         </div>
       </div>
     </div>
+
+    <!-- Success Modal -->
+    <div v-if="showSuccessModal" class="modal-overlay">
+      <div class="modal-content">
+        <h3>Success!</h3>
+        <p>Thank you for sharing your thoughts with us.</p>
+        <div class="modal-actions">
+          <button @click="showSuccessModal = false" class="btn btn-confirm">Close</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
+
+
+
+
+
 
 <script>
 import { auth, db } from "../firebase"; // Import Firebase auth and Firestore
 import { onAuthStateChanged } from "firebase/auth";
-import { collection, addDoc, getDocs, query, orderBy, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 export default {
   name: 'Discussion',
@@ -48,6 +64,7 @@ export default {
       errorMessage: '', // Error message for user feedback
       user: null, // Logged-in user
       showLoginModal: false, // Control login modal visibility
+      showSuccessModal: false, // Control success modal visibility
     };
   },
   async created() {
@@ -83,11 +100,15 @@ export default {
         await addDoc(commentsRef, {
           text: this.newComment,
           author: this.user.displayName || this.user.email, // Use displayName or email
+          uid: this.user.uid, // Include the user's UID
           timestamp: serverTimestamp(), // Add a timestamp
         });
 
         // Clear the input field
         this.newComment = '';
+
+        // Show success modal
+        this.showSuccessModal = true;
       } catch (error) {
         this.errorMessage = 'Failed to post your feedback. Please try again.';
         console.error("Error posting feedback:", error);
@@ -102,6 +123,65 @@ export default {
   },
 };
 </script>
+
+
+
+<style scoped>
+/* Success Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn-confirm {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-confirm:hover {
+  background: linear-gradient(135deg, #2575fc, #6a11cb);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-cancel {
+  background: #ccc;
+  color: #333;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+</style>
 
 <style scoped>
 /* Modern Font */

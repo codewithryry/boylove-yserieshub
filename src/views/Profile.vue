@@ -12,7 +12,7 @@
           />
           <i v-else class="fas fa-user-circle profile-icon"></i>
           <div class="profile-info">
-            <h2 class="profile-name">{{ user.displayName || "User" }}</h2>
+            <br>
             <p class="profile-email">{{ user.email }}</p>
             <div class="subscription-status">
               <div v-if="isSubscriptionExpired" class="status-none">
@@ -31,6 +31,9 @@
             </div>
             <button @click="openEditModal" class="btn-edit-profile">
               <i class="fas fa-edit"></i> Edit Display Name
+            </button>
+            <button v-if="isAdmin" @click="goToAdminDashboard" class="btn-admin-dashboard">
+              <i class="fas fa-tachometer-alt"></i> Admin Dashboard
             </button>
           </div>
         </div>
@@ -51,19 +54,32 @@
           </div>
         </div>
 
-        <!-- Recent Activity Section -->
-        <div class="recent-activity">
-          <h3>Recent Activity</h3>
-          <div v-if="recentActivity.length > 0" class="activity-list">
-            <div v-for="(activity, index) in recentActivity" :key="index" class="activity-item">
-              <i class="fas fa-clock"></i>
-              <span>{{ activity }}</span>
-            </div>
-          </div>
-          <div v-else class="no-activity">
-            No recent activity.
-          </div>
-        </div>
+<!-- Recent Activity Section -->
+<div class="recent-activity">
+  <h3>Activity Log</h3>
+  <p class="activity-description">
+    All your contact submissions and feedback are displayed here.
+  </p>
+
+  <div v-if="recentActivity.length > 0" class="activity-list">
+    <div v-for="(activity, index) in recentActivity" :key="index" class="activity-item">
+      <div class="activity-icon">
+        <!-- <i v-if="activity.type === 'comment'" class="fas fa-comment"></i>
+        <i v-if="activity.type === 'contact'" class="fas fa-envelope"></i> -->
+      </div>
+      <div class="activity-content">
+        <p class="activity-text">{{ activity.text }}</p>
+      </div>
+      <div class="activity-timestamp">
+        {{ formatTimestamp(activity.timestamp) }}
+      </div>
+    </div>
+  </div>
+  <div v-else class="no-activity">
+    No recent activity.
+  </div>
+</div>
+
       </div>
     </div>
     <div v-else class="loading">
@@ -73,7 +89,6 @@
     <!-- Edit Profile Modal -->
     <div v-if="isEditModalOpen" class="modal-overlay">
       <div class="modal-content">
-  
         <h2>Edit Display Name</h2>
         <!-- Alert Message -->
         <div v-if="alertMessage" :class="['alert', alertType]">
@@ -81,7 +96,6 @@
         </div>
         <form @submit.prevent="updateProfile">
           <div class="form-group">
-           
             <input
               type="text"
               id="displayName"
@@ -100,13 +114,10 @@
   </div>
 </template>
 
-
-
-
 <script>
 import { auth, db } from "../firebase"; // Import Firebase auth and Firestore
 import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { updateProfile } from "firebase/auth";
 
 export default {
@@ -121,6 +132,7 @@ export default {
       alertMessage: '', // Message to display in the modal
       alertType: '', // Type of alert (success or error)
       recentActivity: [], // Array to store recent user activity
+      isAdmin: false, // Whether the user is an admin
     };
   },
   computed: {
@@ -146,7 +158,8 @@ export default {
         this.user = user;
         this.editDisplayName = user.displayName || '';
         await this.fetchSubscription();
-        this.fetchRecentActivity(); // Fetch recent activity
+        await this.fetchRecentActivity(); // Fetch recent activity
+        await this.checkIfAdmin(); // Check if the user is an admin
       } else {
         this.user = null;
       }
@@ -159,6 +172,79 @@ export default {
         const userData = userDoc.data();
         this.subscription = userData.subscription || '';
         this.subscriptionExpiry = userData.expiryDate || null;
+      }
+    },
+    async fetchRecentActivity() {
+      this.recentActivity = [];
+
+      try {
+        // Fetch comments made by the logged-in user
+        const commentsQuery = query(
+          collection(db, "comments"),
+          where("uid", "==", this.user.uid) // Filter by the logged-in user's UID
+        );
+        const commentsSnapshot = await getDocs(commentsQuery);
+        commentsSnapshot.forEach((doc) => {
+          const comment = doc.data();
+          const timestamp = comment.timestamp?.toDate();
+          this.recentActivity.push({
+            type: "comment",
+            text: `"${comment.text}"`,
+            timestamp,
+          });
+        });
+
+        // Fetch contact submissions made by the logged-in user
+        const submissionsQuery = query(
+          collection(db, "contactSubmissions"),
+          where("uid", "==", this.user.uid) // Filter by the logged-in user's UID
+        );
+        const submissionsSnapshot = await getDocs(submissionsQuery);
+        submissionsSnapshot.forEach((doc) => {
+          const submission = doc.data();
+          const timestamp = submission.timestamp?.toDate();
+          this.recentActivity.push({
+            type: "contact",
+            text: `"${submission.message}"`,
+            timestamp,
+          });
+        });
+
+        // Sort activities by timestamp (if available)
+        this.recentActivity.sort((a, b) => b.timestamp - a.timestamp);
+      } catch (error) {
+        console.error("Error fetching recent activity:", error);
+        this.showAlert("Failed to fetch recent activity. Please try again.", "error");
+      }
+    },
+    formatTimestamp(timestamp) {
+      const now = new Date();
+      const activityDate = new Date(timestamp);
+      const diffInSeconds = Math.floor((now - activityDate) / 1000);
+
+      if (diffInSeconds < 60) {
+        return `${diffInSeconds} seconds ago`;
+      } else if (diffInSeconds < 3600) {
+        const minutes = Math.floor(diffInSeconds / 60);
+        return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+      } else if (diffInSeconds < 86400) {
+        const hours = Math.floor(diffInSeconds / 3600);
+        return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+      } else {
+        return activityDate.toLocaleString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+    },
+    async checkIfAdmin() {
+      const userDoc = await getDoc(doc(db, "users", this.user.uid));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        this.isAdmin = userData.role === "admin";
       }
     },
     openEditModal() {
@@ -200,12 +286,171 @@ export default {
     upgradeSubscription() {
       this.$router.push({ path: '/pricing' });
     },
-    fetchRecentActivity() {
-
+    goToAdminDashboard() {
+      this.$router.push({ path: '/admin' });
     },
   },
 };
 </script>
+
+
+<style scoped>
+.activity-description {
+  font-size: 0.9rem;
+  color: #666; /* Subtle gray color */
+  margin-bottom: 20px; /* Space below the description */
+  text-align: center; /* Center-align the text */
+}
+</style>
+
+<style scoped>
+.recent-activity {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 15px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(221, 221, 221, 0.5);
+  border-radius: 10px;
+  padding: 15px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.activity-icon {
+  font-size: 1.5rem;
+  color: #4caf50;
+}
+
+.activity-content {
+  flex: 1; /* Takes up remaining space */
+  text-align: left; /* Ensures text is aligned to the left */
+}
+
+.activity-text {
+  font-size: 1rem;
+  color: #333;
+  margin: 0;
+}
+
+.activity-timestamp {
+  font-size: 0.875rem;
+  color: #777;
+  white-space: nowrap; /* Prevents timestamp from wrapping */
+  margin-left: auto; /* Pushes timestamp to the right */
+}
+
+.no-activity {
+  font-size: 1rem;
+  color: #777;
+
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .activity-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .activity-icon {
+    font-size: 1.25rem;
+  }
+
+  .activity-text {
+    font-size: 0.875rem;
+  }
+
+  .activity-timestamp {
+    font-size: 0.75rem;
+    margin-left: 0; /* Reset margin for mobile */
+  }
+}
+</style>
+
+<style scoped>
+/* Admin Badge */
+.admin-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 10px;
+}
+
+.admin-icon {
+  color: #4caf50; /* Green color for admin */
+  font-size: 1.2rem;
+}
+
+.admin-text {
+  display: none; /* Hide text by default */
+}
+
+/* Show text on desktop */
+@media (min-width: 768px) {
+  .admin-text {
+    display: inline; /* Show text on desktop */
+  }
+}
+
+/* Admin Dashboard Button */
+.btn-admin-dashboard {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  margin-top: 10px;
+}
+
+.btn-admin-dashboard:hover {
+  background: linear-gradient(135deg, #2575fc, #6a11cb);
+}
+
+/* Activity Items */
+.activity-item {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(221, 221, 221, 0.5);
+  border-radius: 10px;
+  padding: 10px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.activity-item i {
+  color: #4caf50;
+}
+
+.no-activity {
+  font-size: 1rem;
+  color: #777;
+
+}
+</style>
+
+
+
+
+
 
 
 
@@ -374,7 +619,7 @@ export default {
 .no-activity {
   font-size: 1rem;
   color: #777;
-  font-style: italic;
+
 }
 
 .modal-overlay {
