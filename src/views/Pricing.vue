@@ -1,10 +1,12 @@
 <template>
   <div class="pricing py-4">
-    <h1 class="text-center mb-4 display-4 fw-bold">Pricing</h1>
+    <h1 class="text-center mb-3 display-4 fw-bold">Subscription</h1>
     <div class="container">
+      
       <p class="lead text-center">
         Explore our affordable pricing plans to get the most out of our Thai BL recommendations!
       </p>
+      <br>
       <div class="row">
         <!-- Trial Plan -->
         <div class="col-md-4 text-center mb-4">
@@ -63,6 +65,7 @@
           </div>
         </div>
       </div>
+      <br>
     </div>
   </div>
 </template>

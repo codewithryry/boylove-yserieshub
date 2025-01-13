@@ -5,7 +5,7 @@ import { doc, getDoc } from 'firebase/firestore'; // For Firestore queries
 
 const routes = [
   // Define all routes with lazy loading and meta titles
-  { path: '/', component: () => import('../views/Home.vue'), meta: { title: 'Home | YSeriesHub' } },
+  { path: '/', component: () => import('../views/Home.vue'), name: 'Home', meta: { title: 'Home | YSeriesHub' } },
   { path: '/recommendations', component: () => import('../views/Recommendations.vue'), meta: { title: 'Series | YSeriesHub' } },
   { path: '/about', component: () => import('../views/About.vue'), meta: { title: 'About Us | YSeriesHub' } },
   { path: '/series/:id', component: () => import('../views/SeriesDetail.vue'), props: true, meta: { title: 'Series Details | YSeriesHub' } },
@@ -65,22 +65,58 @@ const routes = [
     meta: { requiresAuth: true, title: 'YChat | YSeriesHub' },
   },
   {
-    path: '/admin',
+    path: '/admindashboard',
     name: 'Admin',
     component: () => import('../views/Admin.vue'),
-    meta: { requiresAuth: true, requiresAdmin: true, title: 'Admin | YSeriesHub' }, // Admin route
+    meta: { requiresAuth: true, requiresAdmin: true, title: 'Admin Dashboard | YSeriesHub' }, // Admin route
   },
   {
     path: '/blocked',
     name: 'Blocked',
-    component: () => import('../views/Blocked.vue'),
+    component: () => import('../components/Blocked.vue'),
     meta: { title: 'Access Denied | YSeriesHub' },
+  },
+  {
+    path: '/underconstruction',
+    name: 'UnderConstruction',
+    component: () => import('../components/UnderConstruction.vue'),
+    meta: { title: 'Under Construction | YSeriesHub' },
+  },
+  {
+    path: '/undermaintenance',
+    name: 'UnderMaintenance',
+    component: () => import('../components/UnderMaintenance.vue'),
+    meta: { title: 'Under Maintenance | YSeriesHub' },
+  },
+  {
+    path: '/under-maintenance-not-user',
+    name: 'UnderMaintenanceNotUser',
+    component: () => import('../components/UnderMaintenanceNotuser.vue'),
+    meta: { title: 'Under Maintenance | YSeriesHub' },
+  },
+  {
+    path: '/ymindai',
+    name: 'YMindAI',
+    component: () => import('../views/YMindAI.vue'),
+    meta: { requiresAuth: true, title: 'YMindAI | YSeriesHub' }, // Add meta info if needed
+  },
+  {
+    path: '/ystream',
+    name: 'YStream',
+    component: () => import('../views/YStream.vue'),
+    meta: { requiresAuth: true, title: 'YStream | YSeriesHub' }, // Add meta info if needed
+  },
+  {
+    path: '/request-series',
+    name: 'RequestSeries',
+    component: () => import('@/views/RequestSeries.vue'), // Adjust the path as needed
+    meta: { requiresAuth: true, title: 'Request Series | YSeriesHub' }, // Add meta info if needed
   },
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
-    component: () => import('../views/404.vue'),
-    meta: { title: '404 - Page Not Found' },
+    component: () => import('../components/404.vue'),
+    meta: { title: '404 - Page Not Found | YSeriesHub' },
   },
 ];
 
@@ -89,15 +125,33 @@ const router = createRouter({
   routes,
 });
 
+let currentUser = null;
+let isAdmin = false;
+
+// Function to check if the user is an admin
+const checkAdmin = async (uid) => {
+  try {
+    const userDoc = await getDoc(doc(db, 'users', uid));
+    if (userDoc.exists()) {
+      return userDoc.data().role === 'admin';
+    }
+  } catch (error) {
+    console.error('Error checking admin status:', error);
+  }
+  return false;
+};
+
+// Track authentication state
+onAuthStateChanged(auth, async (user) => {
+  currentUser = user;
+  if (user) {
+    isAdmin = await checkAdmin(user.uid);
+  } else {
+    isAdmin = false;
+  }
+});
+
 router.beforeEach(async (to, from, next) => {
-  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
-  const requiresAdmin = to.matched.some((record) => record.meta.requiresAdmin);
-  const requiresGuest = to.matched.some((record) => record.meta.requiresGuest);
-
-  // Set the page title
-  const title = to.meta.title || 'YSeriesHub'; // Fallback title
-  document.title = title;
-
   // Wait for Firebase auth to initialize and get the current user
   const currentUser = await new Promise((resolve) => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -106,34 +160,70 @@ router.beforeEach(async (to, from, next) => {
     });
   });
 
+  // Check if the user is an admin
+  let isAdmin = false;
+  if (currentUser) {
+    try {
+      const userDoc = await getDoc(doc(db, 'users', currentUser.uid)); // Fetch user document from Firestore
+      isAdmin = userDoc.exists() && userDoc.data().role === 'admin';
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+    }
+  }
+
+  // Fetch maintenance mode flag from Firestore
+  let isMaintenanceMode = false; // Default to false
+  try {
+    const maintenanceDoc = await getDoc(doc(db, 'config', 'maintenance'));
+    if (maintenanceDoc.exists()) {
+      isMaintenanceMode = maintenanceDoc.data().underConstruction; // Fetch the value from Firestore
+      console.log('Maintenance Mode:', isMaintenanceMode); // Debugging
+    }
+  } catch (error) {
+    console.error('Error fetching maintenance mode:', error);
+  }
+
+  // List of routes that are exempt from maintenance mode or blocked restrictions
+  const exemptRoutes = ['UnderMaintenanceNotUser', 'UnderMaintenance', 'UnderConstruction', 'NotFound', 'Blocked']; // Add route names that should be accessible
+
+  // Check if the current route is exempt
+  const isExemptRoute = exemptRoutes.includes(to.name);
+
+  // Maintenance mode check (block all users except admins and exempt routes)
+  if (isMaintenanceMode && !isAdmin && !isExemptRoute) {
+    if (!currentUser) {
+      // Redirect non-users to UnderMaintenanceNotUser
+      next({ name: 'UnderMaintenanceNotUser' }); // Redirect to the UnderMaintenanceNotUser page
+      return;
+    } else {
+      // Redirect authenticated non-admin users to UnderMaintenance
+      next({ name: 'UnderMaintenance' }); // Redirect to the UnderMaintenance page
+      return;
+    }
+  }
+
+  // If maintenance mode is off, redirect to the home page
+  if (!isMaintenanceMode && to.name === 'UnderMaintenanceNotUser') {
+    next({ path: '/' }); // Redirect to the home page
+    return;
+  }
+
+  // If maintenance mode is off, user is admin, or route is exempt, proceed with normal navigation
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+  const requiresAdmin = to.matched.some((record) => record.meta.requiresAdmin);
+  const requiresGuest = to.matched.some((record) => record.meta.requiresGuest);
+
+  // Set the page title
+  const title = to.meta.title || 'YSeriesHub'; // Fallback title
+  document.title = title;
+
   // Handle authentication
   if (requiresAuth && !currentUser) {
-    next('/Login'); // Block unauthenticated users
+    next('/login'); // Block unauthenticated users
   } else if (requiresGuest && currentUser) {
     next('/blocked'); // Block authenticated users trying to access guest routes
-  } else if (requiresAdmin) {
-    // Check if the user is an admin
-    if (currentUser) {
-      try {
-        const userDoc = await getDoc(doc(db, 'users', currentUser.uid)); // Fetch user document from Firestore
-
-        // Debugging logs
-        console.log('Current user:', currentUser);
-        console.log('User document:', userDoc?.data());
-        console.log('User role:', userDoc?.data()?.role);
-
-        if (userDoc.exists() && userDoc.data().role === 'admin') {
-          next(); // Allow access to the Admin page
-        } else {
-          next('/blocked'); // Block non-admin users
-        }
-      } catch (error) {
-        console.error('Error checking admin status:', error);
-        next('/blocked'); // Block in case of an error
-      }
-    } else {
-      next('/blocked'); // Block unauthenticated users trying to access admin routes
-    }
+  } else if (requiresAdmin && !isAdmin) {
+    next('/blocked'); // Block non-admin users
   } else {
     next(); // Allow access to non-protected routes
   }

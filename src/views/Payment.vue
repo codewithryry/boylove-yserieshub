@@ -143,15 +143,13 @@
 
     <!-- Side Notification -->
     <div v-if="showNotification" class="notification-toast">
-  <div class="toast-content">
-    <i class="me-2"></i>
-    <div>
-      <p class="mb-0">This is a demonstration of a payment form. You can input any data here, and it won't be processed. No real transactions are performed.</p>
+      <div class="toast-content">
+        <i class="me-2"></i>
+        <div>
+          <p class="mb-0">This is a demonstration of a payment form. You can input any data here, and it won't be processed. No real transactions are performed.</p>
+        </div>
+      </div>
     </div>
-    
-  </div>
-</div>
-
   </div>
 </template>
 
@@ -274,7 +272,8 @@ export default {
       }
     },
     closeModal() {
-      this.showModal = false;
+      this.showModal = false; // Close the modal
+      this.$router.push('/'); // Redirect to the home page
     },
     checkAuthState() {
       onAuthStateChanged(auth, (user) => {

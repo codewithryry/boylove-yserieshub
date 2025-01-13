@@ -13,6 +13,7 @@
           <i v-else class="fas fa-user-circle profile-icon"></i>
           <div class="profile-info">
             <br>
+            <p class="profile-displayName">{{ user.displayName }}</p>
             <p class="profile-email">{{ user.email }}</p>
             <div class="subscription-status">
               <div v-if="isSubscriptionExpired" class="status-none">
@@ -32,9 +33,9 @@
             <button @click="openEditModal" class="btn-edit-profile">
               <i class="fas fa-edit"></i> Edit Display Name
             </button>
-            <button v-if="isAdmin" @click="goToAdminDashboard" class="btn-admin-dashboard">
+            <!-- <button v-if="isAdmin" @click="goToAdminDashboard" class="btn-admin-dashboard">
               <i class="fas fa-tachometer-alt"></i> Admin Dashboard
-            </button>
+            </button> -->
           </div>
         </div>
       </div>
@@ -287,7 +288,7 @@ export default {
       this.$router.push({ path: '/pricing' });
     },
     goToAdminDashboard() {
-      this.$router.push({ path: '/admin' });
+      this.$router.push({ path: '/admindashboard' });
     },
   },
 };
@@ -300,6 +301,28 @@ export default {
   color: #666; /* Subtle gray color */
   margin-bottom: 20px; /* Space below the description */
   text-align: center; /* Center-align the text */
+}
+</style>
+
+<style>
+.profile-displayName {
+  font-family: 'Poppins', sans-serif; /* Modern font */
+  font-size: 1.5rem; /* Larger font size */
+  font-weight: 600; /* Semi-bold */
+  color: #2c3e50; /* Dark blue-gray color */
+  margin: 0; /* Remove default margin */
+  padding: 10px 0; /* Add some padding */
+  text-align: center; /* Center the text */
+  background: linear-gradient(135deg, #000000, #000000); /* Gradient background */
+  -webkit-background-clip: text; /* Clip text to the background */
+  -webkit-text-fill-color: transparent; /* Make text transparent */
+  display: inline-block; /* Ensure the gradient applies correctly */
+}
+
+/* Optional: Add a hover effect */
+.profile-displayName:hover {
+  transform: scale(1.05); /* Slightly enlarge on hover */
+  transition: transform 0.3s ease; /* Smooth transition */
 }
 </style>
 

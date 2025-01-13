@@ -38,9 +38,14 @@
           </div>
         </div>
       </div>
-      <!-- Load More Button -->
-      <div class="text-center mt-4" v-if="visibleItems.length < blList.length">
-        <button class="btn btn-load-more" @click="loadMore">Load More</button>
+
+      <!-- Request a Series Section -->
+      <div class="text-center mt-4 request-section">
+        <p class="mb-3 request-text">Can't find your favorite series?</p>
+        <button class="btn btn-request" @click="goToRequestPage">
+          <span class="btn-text">Request a Series</span>
+          <span class="btn-icon"><i class="fas fa-arrow-right"></i></span>
+        </button>
       </div>
     </div>
 
@@ -95,20 +100,14 @@ export default {
         }
       }
     },
-    loadMore() {
-      // Calculate the next set of items to display
-      const nextItems = this.blList.slice(
-        this.visibleItems.length,
-        this.visibleItems.length + this.itemsPerLoad
-      );
-      // Add the next items to the visibleItems array
-      this.visibleItems = [...this.visibleItems, ...nextItems];
-    },
     handleScroll() {
       this.showBackToTop = window.scrollY > 300; // Show button if scrolled more than 300px
     },
     scrollToTop() {
       window.scrollTo({ top: 0, behavior: 'smooth' }); // Smooth scroll to top
+    },
+    goToRequestPage() {
+      this.$router.push({ path: '/request-series' }); // Redirect to the request series page
     },
   },
   created() {
@@ -132,8 +131,130 @@ export default {
 };
 </script>
 
-
 <style scoped>
+/* Existing styles... */
+
+/* Back to Top Button */
+.back-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  border: none;
+  color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.back-to-top:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.back-to-top:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.request-section {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  padding: 40px 20px;
+  border-radius: 15px;
+  margin: 40px 0;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.request-section:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+}
+
+.request-text {
+  font-size: 1.25rem;
+  color: #fff;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.btn-request {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  color: #2575fc;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-request:hover {
+  background: #f0f0f0;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-request:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-text {
+  margin-right: 8px;
+}
+
+.btn-icon {
+  font-size: 1rem;
+  margin-left: 8px;
+  transition: transform 0.3s ease;
+}
+
+.btn-request:hover .btn-icon {
+  transform: translateX(5px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .back-to-top {
+    bottom: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .request-text {
+    font-size: 1rem;
+  }
+
+  .btn-request {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+}
+</style>
+<style scoped>
+
+
+
 /* Existing styles... */
 
 /* Back to Top Button */

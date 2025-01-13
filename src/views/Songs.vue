@@ -110,12 +110,11 @@
       </div>
     </div>
 
-    <!-- Load More Button -->
+    
     <div class="load-more" v-if="visibleSongs.length < filteredSongs.length">
-      <button @click="loadMore" class="btn-load-more">Load More</button>
+     <button @click="loadMore" class="btn-load-more">Load More</button>
     </div>
 
-    <!-- Back to Top Button -->
     <button
       v-if="showBackToTop"
       @click="scrollToTop"
@@ -125,14 +124,10 @@
       <i class="fas fa-arrow-up"></i>
     </button>
   </div>
-
 </template>
 
 
 <style scoped>
-/* Existing styles... */
-
-/* Back to Top Button */
 .back-to-top {
   position: fixed;
   bottom: 20px;

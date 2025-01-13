@@ -146,7 +146,7 @@ export default {
         const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists()) {
           const userData = userDoc.data();
-          this.isVIP = userData.subscription === "vip"; // Use the exact value from Firestore
+          this.isVIP = userData.subscription === "vip plan"; // Use the exact value from Firestore
         } else {
           console.error("User document does not exist.");
         }

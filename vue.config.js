@@ -1,3 +1,5 @@
+const webpack = require('webpack'); // Import webpack for DefinePlugin
+
 module.exports = {
   devServer: {
     setupMiddlewares: (middlewares, devServer) => {
@@ -26,8 +28,20 @@ module.exports = {
         res.redirect('/blocked'); // Redirect to /blocked
       });
 
+
+      
+
       // Return the middlewares array
       return middlewares;
     },
+  },
+
+  // Add DefinePlugin configuration here
+  configureWebpack: {
+    plugins: [
+      new webpack.DefinePlugin({
+        __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: JSON.stringify(false), // Set to false to suppress hydration mismatch warnings
+      }),
+    ],
   },
 };

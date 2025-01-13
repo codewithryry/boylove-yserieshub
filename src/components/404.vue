@@ -25,8 +25,8 @@ export default {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, rgba(106, 17, 203, 0.7), rgba(37, 117, 252, 0.7)); /* Semi-transparent gradient */
-  color: #fff;
+  background: #f3f4f6; /* Light grey background for a softer look */
+  color: #1f2937; /* Neutral dark color for text */
   font-family: 'Inter', sans-serif;
   padding: 20px;
 }
@@ -34,29 +34,32 @@ export default {
 .content {
   text-align: center;
   max-width: 600px;
-  animation: fadeIn 1s ease-in-out;
+  animation: fadeIn 0.8s ease-in-out; /* Slightly shorter fade-in for efficiency */
 }
 
 .title {
-  font-size: 8rem;
+  font-size: clamp(6rem, 15vw, 10rem); /* Responsive font size */
   font-weight: 900;
   margin: 0;
-  background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+  background: linear-gradient(45deg, #6366f1, #38bdf8); /* Gradient for title text */
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: float 3s ease-in-out infinite;
 }
 
 .subtitle {
-  font-size: 2rem;
+  font-size: clamp(1.5rem, 5vw, 2.5rem); /* Responsive font size */
   font-weight: 600;
   margin: 10px 0;
+  color: #4b5563; /* Neutral color for subtitle */
 }
 
 .description {
-  font-size: 1.25rem;
+  font-size: clamp(1rem, 4vw, 1.5rem); /* Responsive font size */
   margin: 20px 0;
-  color: rgba(255, 255, 255, 0.8);
+  color: #6b7280; /* Grey color for description */
+  line-height: 1.5; /* Improved readability through line spacing */
 }
 
 .home-link {
@@ -65,8 +68,8 @@ export default {
   padding: 12px 24px;
   font-size: 1rem;
   font-weight: 600;
-  color: #6a11cb;
-  background: #fff;
+  color: #ffffff;
+  background: #6366f1; /* Purple background */
   border-radius: 50px;
   text-decoration: none;
   transition: all 0.3s ease;
@@ -74,7 +77,7 @@ export default {
 }
 
 .home-link:hover {
-  background: #f0f0f0;
+  background: #4f46e5; /* Darker purple on hover */
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
 }
@@ -97,6 +100,24 @@ export default {
   }
   50% {
     transform: translateY(-10px);
+  }
+}
+
+/* Mobile Optimization */
+@media (max-width: 480px) {
+  .title {
+    font-size: 5rem; /* Adjust title size for smaller screens */
+  }
+
+  .description {
+    font-size: 1rem; /* Ensure readability on mobile */
+  }
+
+  .home-link {
+    width: 100%;
+    max-width: 300px;
+    padding: 1em; /* Easier tap interaction for mobile users */
+    font-size: 1.1rem; /* Slightly larger text for better readability */
   }
 }
 </style>

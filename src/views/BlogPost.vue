@@ -31,10 +31,12 @@
           The blog you're looking for doesn't exist or has been moved.
         </p>
         <router-link to="/blog" class="home-link">
-          <i class="fas fa-arrow-left"></i> Back to Blogs
+          <i class=""></i> Back to Blogs
         </router-link>
       </div>
     </div>
+
+
   </div>
 </template>
 
@@ -135,13 +137,13 @@ export default {
   }
 
   
-  .not-found {
+.not-found {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, rgba(106, 17, 203, 0.7), rgba(37, 117, 252, 0.7)); /* Semi-transparent gradient */
-  color: #fff;
+  background: #ffffff; /* White background */
+  color: #000000; /* Dark text color for contrast */
   font-family: 'Inter', sans-serif;
   padding: 20px;
 }
@@ -156,7 +158,7 @@ export default {
   font-size: 8rem;
   font-weight: 900;
   margin: 0;
-  background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+  background: linear-gradient(45deg, #6366f1, #38bdf8); /* Gradient for title text */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: float 3s ease-in-out infinite;
@@ -171,7 +173,7 @@ export default {
 .description {
   font-size: 1.25rem;
   margin: 20px 0;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(0, 0, 0, 0.8);
 }
 
 .home-link {
@@ -180,8 +182,8 @@ export default {
   padding: 12px 24px;
   font-size: 1rem;
   font-weight: 600;
-  color: #6a11cb;
-  background: #fff;
+  color: #ffffff;
+  background: #6366f1; /* Purple background */
   border-radius: 50px;
   text-decoration: none;
   transition: all 0.3s ease;
@@ -189,7 +191,7 @@ export default {
 }
 
 .home-link:hover {
-  background: #f0f0f0;
+  background: #4f46e5; /* Darker purple on hover */
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
 }

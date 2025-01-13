@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <!-- Modern Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-gradient">
+    <!-- Navbar (Conditional Rendering) -->
+    <nav v-if="!isAdminRoute" class="navbar navbar-expand-lg navbar-dark bg-gradient">
       <div class="container">
         <!-- Logo and Brand Name -->
         <router-link to="/" class="navbar-brand d-flex align-items-center">
@@ -79,11 +79,38 @@
             <li class="nav-item">
               <router-link to="/pricing" class="nav-link">Pricing</router-link>
             </li>
-
-            <!-- Add YChat Link -->
-          <li class="nav-item">
-            <router-link to="/ychat" class="nav-link">YChat</router-link>
-          </li>
+            <!-- More Dropdown -->
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbarDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+              Explore
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li>
+                  <router-link to="/ychat"  class="dropdown-item custom-dropdown-item">
+                    <i class=""></i>YChat
+                  </router-link>
+                </li>
+              
+                <li>
+                  <router-link to="/ymindai" class="dropdown-item custom-dropdown-item">
+                    <i class=""></i>YMindAI
+                  </router-link>
+                </li>
+                <li>
+                  <router-link to="/underconstruction" class="dropdown-item custom-dropdown-item">
+                    <i class=" "></i>YStream
+                  </router-link>
+                </li>
+              </ul>
+            </li>
+          
             <!-- More Dropdown -->
             <li class="nav-item dropdown">
               <a
@@ -167,14 +194,13 @@
       </div>
     </nav>
 
-    <!-- Sidebar -->
-    <nav class="sidebar" :class="{ open: isSidebarOpen }">
+    <!-- Sidebar (Conditional Rendering) -->
+    <nav v-if="!isAdminRoute" class="sidebar" :class="{ open: isSidebarOpen }">
       <div class="logo_items flex">
         <span class="nav_image">
           <img src="/images/boylove.png" alt="logo_img" />
         </span>
         <span class="logo_name">YSeriesHub</span>
-        <i class="bx bx-x" id="sidebar-close" @click="toggleSidebar" style="color: #000000;"></i>
       </div>
 
       <div class="menu_container">
@@ -217,12 +243,24 @@
 
           <ul class="menu_item">
             <div class="menu_title flex">
-              <span class="title">Messenges</span>
+              <span class="title">Features</span>
             </div>
             <li class="item">
               <router-link to="/ychat" class="link flex" @click="closeSidebar">
                 <i class="bx bx-grid-alt"></i>
-                <span>Ychat</span>
+                <span>YChat</span>
+              </router-link>
+            </li>
+            <li class="item">
+              <router-link to="/ymindai" class="link flex" @click="closeSidebar">
+                <i class="bx bx-chat"></i>
+                <span>YMindAI</span>
+              </router-link>
+            </li>
+            <li class="item">
+              <router-link to="/underconstruction" class="link flex" @click="closeSidebar">
+                <i class="bx bx-movie-play"></i>
+                <span>YStream</span>
               </router-link>
             </li>
           </ul>
@@ -255,7 +293,6 @@
                 <span>ThailatorAI</span>
               </router-link>
             </li>
-
             <li class="item">
               <router-link to="/faq" class="link flex" @click="closeSidebar">
                 <i class="bx bx-question-mark"></i>
@@ -301,14 +338,57 @@
     <!-- Router View -->
     <router-view />
 
-    <!-- Footer -->
+    
     <footer class="footer mt-auto py-3 bg-light">
-      <div class="container text-center">
-        <span class="text-muted">© 2025 YSeriesHub. All rights reserved.</span>
-      </div>
-    </footer>
+  <div class="container text-center">
+    <div class="footer-content">
+      <!-- Footer Links -->
+      <span class="text-muted small">© 2025 YSeriesHub. All rights reserved.</span>
+      <span class="text-muted separator small">|</span>
+      <a href="https://docs.google.com/document/d/1Oy7IM_-eaEArYd3IBP_cscHlS8sNg9H5n0Exc69-ZrM/edit?usp=sharing" class="text-muted small">AI Generated Content</a>
+      <span class="text-muted separator small">|</span>
+      <a href="https://www.termsfeed.com/live/2fd9d983-7f01-4d42-9902-45d20ba490d2" class="text-muted small">Terms</a>
+      <span class="text-muted separator small">|</span>
+      <a href="https://www.freeprivacypolicy.com/live/e8879e4c-350b-4d12-bbf7-d750809a9f6c" class="text-muted small">Privacy</a>
+    </div>
+  </div>
+</footer>
   </div>
 </template>
+
+
+<style>
+  .footer-content {
+    white-space: nowrap; /* Prevent line breaks */
+    overflow-x: auto; /* Enable horizontal scrolling if needed */
+    padding-bottom: 5px; /* Add some space at the bottom */
+  }
+</style>
+<style>
+.footer {
+  font-family: 'Poppins', sans-serif;
+}
+
+.footer-content {
+  display: flex;
+  flex-wrap: wrap; /* Allow wrapping on small screens */
+  justify-content: center; /* Center content horizontally */
+  align-items: center; /* Center content vertically */
+  gap: 8px; /* Add spacing between items */
+}
+
+/* Media Query for Smallest Phones */
+@media (max-width: 480px) {
+  .footer-content {
+    flex-direction: row; /* Keep items inline */
+    gap: 4px; /* Reduce spacing for smaller screens */
+  }
+
+  .footer-content span {
+    white-space: nowrap; /* Prevent text from wrapping */
+  }
+}
+</style>
 
 
 <style>
@@ -319,6 +399,13 @@
   width: 24px;
   height: 24px;
   cursor: pointer;
+}
+@media (max-width: 320px) {
+  .footer-content {
+    overflow-x: auto; /* Enable horizontal scrolling */
+    justify-content: flex-start; /* Align content to the left */
+    padding: 0 10px; /* Add some padding for better UX */
+  }
 }
 
 
@@ -373,6 +460,12 @@ export default {
       user: null,
     };
   },
+  computed: {
+    isAdminRoute() {
+      // Check if the current route is an admin route
+      return this.$route.path.startsWith('/admin');
+    },
+  },
   methods: {
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen;
@@ -397,7 +490,6 @@ export default {
   },
 };
 </script>
-
 
 
 <style>
