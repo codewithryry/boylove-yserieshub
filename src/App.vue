@@ -97,7 +97,11 @@
                     <i class=""></i>YChat
                   </router-link>
                 </li>
-              
+                <li>
+                  <router-link to="/underconstruction"  class="dropdown-item custom-dropdown-item">
+                    <i class=""></i>YGlobal
+                  </router-link>
+                </li>
                 <li>
                   <router-link to="/ymindai" class="dropdown-item custom-dropdown-item">
                     <i class=""></i>YMindAI
@@ -252,6 +256,12 @@
               </router-link>
             </li>
             <li class="item">
+              <router-link to="/underconstruction" class="link flex" @click="closeSidebar">
+                <i class="bx bx-chat-play"></i>
+                <span>YGlobal</span>
+              </router-link>
+            </li>
+            <li class="item">
               <router-link to="/ymindai" class="link flex" @click="closeSidebar">
                 <i class="bx bx-chat"></i>
                 <span>YMindAI</span>
@@ -263,6 +273,7 @@
                 <span>YStream</span>
               </router-link>
             </li>
+            
           </ul>
 
           <ul class="menu_item">
@@ -345,7 +356,7 @@
       <!-- Footer Links -->
       <span class="text-muted small">© 2025 YSeriesHub. All rights reserved.</span>
       <span class="text-muted separator small">|</span>
-      <a href="https://docs.google.com/document/d/1Oy7IM_-eaEArYd3IBP_cscHlS8sNg9H5n0Exc69-ZrM/edit?usp=sharing" class="text-muted small">AI Generated Content</a>
+      <a href="https://github.com/codewithryry/yserieshub/blob/6e82d426941947e582f9b28a8c3807f18b61b77d/CHANGELOG.md" class="text-muted small">Update Logs</a>
       <span class="text-muted separator small">|</span>
       <a href="https://www.termsfeed.com/live/2fd9d983-7f01-4d42-9902-45d20ba490d2" class="text-muted small">Terms</a>
       <span class="text-muted separator small">|</span>

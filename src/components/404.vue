@@ -6,35 +6,35 @@
       <p class="description">
         The page you're looking for doesn't exist or has been moved.
       </p>
-      <router-link to="/" class="home-link">
-        Go Back Home
-      </router-link>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'NotFound',
+  name: 'NotFoundModern',
 };
 </script>
 
 <style scoped>
+/* Base Styles */
 .not-found {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: #f3f4f6; /* Light grey background for a softer look */
+  background: linear-gradient(135deg, #f3f4f6, #e5e7eb); /* Light grey gradient */
   color: #1f2937; /* Neutral dark color for text */
   font-family: 'Inter', sans-serif;
   padding: 20px;
+  animation: fadeIn 0.8s ease-in-out;
+  margin-top: -2%; /* Added margin-top for mobile */
+  margin-bottom: -4%; /* Added margin-bottom for mobile */
 }
 
 .content {
   text-align: center;
   max-width: 600px;
-  animation: fadeIn 0.8s ease-in-out; /* Slightly shorter fade-in for efficiency */
 }
 
 .title {
@@ -69,7 +69,7 @@ export default {
   font-size: 1rem;
   font-weight: 600;
   color: #ffffff;
-  background: #6366f1; /* Purple background */
+  background: linear-gradient(90deg, #6366f1, #38bdf8); /* Gradient background */
   border-radius: 50px;
   text-decoration: none;
   transition: all 0.3s ease;
@@ -77,7 +77,7 @@ export default {
 }
 
 .home-link:hover {
-  background: #4f46e5; /* Darker purple on hover */
+  background: linear-gradient(90deg, #38bdf8, #6366f1); /* Reversed gradient on hover */
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
 }
@@ -105,6 +105,9 @@ export default {
 
 /* Mobile Optimization */
 @media (max-width: 480px) {
+  .not-found{
+    margin-top: -30%; /* Added margin-top for mobile */
+  }
   .title {
     font-size: 5rem; /* Adjust title size for smaller screens */
   }

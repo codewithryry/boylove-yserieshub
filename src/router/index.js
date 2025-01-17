@@ -76,6 +76,15 @@ const routes = [
     component: () => import('../components/Blocked.vue'),
     meta: { title: 'Access Denied | YSeriesHub' },
   },
+
+  {
+    path: '/yglobal',
+    name: 'YGlobal',
+    component: () => import('../views/YGlobal.vue'),
+    meta: { requiresAuth: true, title: 'YGlobal | YSeriesHub' },
+  },
+
+  
   {
     path: '/underconstruction',
     name: 'UnderConstruction',
@@ -83,13 +92,13 @@ const routes = [
     meta: { title: 'Under Construction | YSeriesHub' },
   },
   {
-    path: '/undermaintenance',
+    path: '/ongoingmaintenance',
     name: 'UnderMaintenance',
     component: () => import('../components/UnderMaintenance.vue'),
     meta: { title: 'Under Maintenance | YSeriesHub' },
   },
   {
-    path: '/under-maintenance-not-user',
+    path: '/undermaintenance',
     name: 'UnderMaintenanceNotUser',
     component: () => import('../components/UnderMaintenanceNotuser.vue'),
     meta: { title: 'Under Maintenance | YSeriesHub' },

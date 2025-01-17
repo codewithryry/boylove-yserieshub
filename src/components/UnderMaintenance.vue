@@ -1,48 +1,50 @@
 <template>
   <div class="maintenance">
-    <div class="maintenance__icon">🔧</div>
-    <h1 class="maintenance__title">We'll Be Back Soon</h1>
-    <p class="maintenance__subtitle">Improving your experience</p>
+    <div class="maintenance__icon">🚀</div>
+    <h1 class="maintenance__title">We're Upgrading!</h1>
+    <p class="maintenance__subtitle">We'll be back soon!</p>
     <div class="maintenance__description">
-      We're performing some updates to make things better. Thank you for your patience. We'll be back shortly!
+      We're working hard to bring you a better experience. Please check back soon!
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'WeWillBeBackSoon',
+  name: 'maintenance__progress-bar',
 };
 </script>
 
 <style scoped>
 /* Base Styles */
 .maintenance {
-  min-height: 100vh;
+  min-height: 100vh; /* Fill the viewport height */
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  padding: 2rem;
-  background: #ffffff; /* White background */
-  color: #1f2937; /* Neutral dark color */
-  font-family: 'Inter', sans-serif;
-  text-align: center;
+  align-items: center;
+  background: linear-gradient(135deg, #f5f5f5, #e0e0e0); /* Light grey gradient */
+  color: #333; /* Text color */
+  font-family: 'Inter', sans-serif; /* Modern font */
+  text-align: center; /* Center text alignment */
+  padding: 2rem; /* Padding around content */
   animation: fadeIn 0.8s ease-out;
+  margin-top: -6%; /* Added margin-top for mobile */
+  margin-bottom: -4%; /* Added margin-bottom for mobile */
 }
 
 .maintenance__icon {
-  font-size: 5rem;
-  margin-bottom: 1.5rem;
-  color: #f59e0b; /* Vibrant yellow */
-  animation: float 3s ease-in-out infinite;
+  font-size: 6rem; /* Icon size */
+  margin-bottom: 1.5rem; /* Spacing under icon */
+  color: #007BFF; /* Primary color for icon */
+  animation: float 3s ease-in-out infinite; /* Floating animation */
 }
 
 .maintenance__title {
-  font-size: clamp(2.5rem, 8vw, 4rem);
-  font-weight: 900;
-  margin: 0;
-  background: linear-gradient(135deg, #6366f1, #38bdf8);
+  font-size: clamp(2.5rem, 8vw, 4rem); /* Responsive title size */
+  font-weight: 900; /* Bold title */
+  margin: 0; /* Remove default margins */
+  background: linear-gradient(135deg, #007BFF, #00C6FF); /* Gradient text */
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -50,38 +52,36 @@ export default {
 }
 
 .maintenance__subtitle {
-  font-size: clamp(1.25rem, 4vw, 1.75rem);
-  margin: 0.75rem 0 1.5rem;
-  color: #4b5563; /* Neutral gray */
-  font-weight: 600;
+  font-size: clamp(1.25rem, 4vw, 1.75rem); /* Responsive subtitle size */
+  margin: 0.75rem 0 1.5rem; /* Margins for spacing */
+  font-weight: 600; /* Medium weight for subtitle */
+  color: #555; /* Subtitle color */
 }
 
 .maintenance__description {
-  font-size: clamp(1rem, 3vw, 1.25rem);
-  line-height: 1.6;
-  margin-bottom: 2rem;
-  color: #6b7280; /* Neutral lighter gray */
-  max-width: 600px;
+  font-size: clamp(1rem, 3.5vw, 1.25rem); /* Responsive description size */
+  line-height: 1.6; /* Better readability */
+  margin-bottom: 2rem; /* Spacing at the bottom */
+  color: #666; /* Description text color */
+  max-width: 800px; /* Maximum width for readability */
+  padding: 0 1rem; /* Side padding for mobile */
 }
 
-.maintenance__button {
-  display: inline-block;
-  padding: 0.75em 2.5em; /* Adjusted padding */
-  font-size: clamp(1rem, 3vw, 1.1rem);
-  font-weight: 600;
-  color: #ffffff;
-  background: linear-gradient(90deg, #6366f1, #38bdf8); /* Gradient background */
-  border-radius: 50px;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-  margin-top: 1.5rem;
+.maintenance__progress {
+  width: 100%;
+  max-width: 400px;
+  height: 8px;
+  background-color: #e0e0e0; /* Light grey background for progress bar */
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 2rem;
 }
 
-.maintenance__button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-  background: linear-gradient(90deg, #38bdf8, #6366f1); /* Reversed gradient on hover */
+.maintenance__progress-bar {
+  width: 60%; /* Progress bar width */
+  height: 100%;
+  background: linear-gradient(90deg, #007BFF, #00C6FF); /* Gradient progress bar */
+  animation: progress 2s ease-in-out infinite; /* Progress bar animation */
 }
 
 /* Animations */
@@ -105,24 +105,40 @@ export default {
   }
 }
 
-/* Mobile Optimizations */
+@keyframes progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Mobile Optimization */
 @media (max-width: 480px) {
   .maintenance {
     padding: 1.5rem;
+    margin-top: -30%; /* Added margin-top for mobile */
   }
 
   .maintenance__icon {
-    font-size: 4rem;
+    font-size: 4rem; /* Smaller icon on mobile */
   }
 
   .maintenance__description {
-    font-size: 1rem;
+    font-size: 0.9rem; /* Smaller text for mobile */
   }
 
-  .maintenance__button {
-    width: 100%;
-    max-width: 300px;
-    padding: 1em;
+  .maintenance__title {
+    font-size: 2rem; /* Adjust title size for mobile */
+  }
+
+  .maintenance__subtitle {
+    font-size: 1.5rem; /* Adjust subtitle size for mobile */
+  }
+
+  .maintenance__progress {
+    height: 6px; /* Thinner progress bar on mobile */
   }
 }
 </style>

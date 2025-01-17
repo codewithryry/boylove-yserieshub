@@ -7,35 +7,35 @@
       </div>
       <h1 class="title">Access Denied</h1>
       <p class="subtitle">Oops! You don't have permission to access this page.</p>
-      <router-link to="/" class="home-link">
-        Go Back Home
-      </router-link>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Blocked',
+  name: 'BlockedModern',
 };
 </script>
 
 <style scoped>
+/* Base Styles */
 .blocked {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: #f9fafb; /* Light grey background */
+  background: linear-gradient(135deg, #f9fafb, #e5e7eb); /* Light grey gradient */
   color: #1f2937; /* Neutral dark text color */
   font-family: 'Inter', sans-serif;
   padding: 20px;
+  animation: fadeIn 0.8s ease-in-out;
+  margin-top: -5%; /* Added margin-top for mobile */
+  margin-bottom: -4%; /* Added margin-bottom for mobile */
 }
 
 .content {
   text-align: center;
   max-width: 600px;
-  animation: fadeIn 1s ease-in-out;
 }
 
 .icon {
@@ -57,7 +57,7 @@ export default {
 
 .subtitle {
   font-size: clamp(1.25rem, 4vw, 2rem); /* Responsive subtitle size */
-  font-weight: 600;
+  font-weight: 400;
   margin: 10px 0;
   color: #4b5563; /* Neutral subtitle color */
 }
@@ -105,6 +105,9 @@ export default {
 
 /* Mobile Optimization */
 @media (max-width: 480px) {
+  .blocked{
+    margin-top: -30%; /* Added margin-top for mobile */
+  }
   .icon {
     font-size: 4rem;
   }

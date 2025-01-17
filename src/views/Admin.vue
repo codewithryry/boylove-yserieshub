@@ -49,14 +49,14 @@
               <div class="analytics-card">
                 <div class="card-icon">👥</div>
                 <div class="card-content">
-                  <h3>Total Users</h3>
+                  <h3>Users</h3>
                   <p class="card-value">{{ totalUsers }}</p>
                 </div>
               </div>
               <div class="analytics-card">
                 <div class="card-icon">👑</div>
                 <div class="card-content">
-                  <h3>Total Admins</h3>
+                  <h3>Admins</h3>
                   <p class="card-value">{{ totalAdmins }}</p>
                 </div>
               </div>
@@ -70,21 +70,21 @@
               <div class="analytics-card">
                 <div class="card-icon">💬</div>
                 <div class="card-content">
-                  <h3>Total Comments</h3>
+                  <h3>Comment</h3>
                   <p class="card-value">{{ totalComments }}</p>
                 </div>
               </div>
               <div class="analytics-card">
                 <div class="card-icon">📨</div>
                 <div class="card-content">
-                  <h3>Contact Submissions</h3>
+                  <h3>Feedback</h3>
                   <p class="card-value">{{ totalContactSubmissions }}</p>
                 </div>
               </div>
               <div class="analytics-card">
                 <div class="card-icon">✉️</div>
                 <div class="card-content">
-                  <h3>Chat Messages</h3>
+                  <h3>Messages</h3>
                   <p class="card-value">{{ totalChatMessages }}</p>
                 </div>
               </div>
@@ -98,14 +98,14 @@
               <div class="analytics-card">
                 <div class="card-icon">💰</div>
                 <div class="card-content">
-                  <h3>Total Revenue</h3>
+                  <h3>Revenue</h3>
                   <p class="card-value">${{ totalRevenue.toFixed(2) }}</p>
                 </div>
               </div>
               <div class="analytics-card">
                 <div class="card-icon">💳</div>
                 <div class="card-content">
-                  <h3>Total Payments</h3>
+                  <h3>Payments</h3>
                   <p class="card-value">{{ totalPayments }}</p>
                 </div>
               </div>
@@ -115,24 +115,30 @@
 
         <!-- Revenue Growth Line Graph -->
         <div class="revenue-graph">
-          <h2>📈 Revenue Growth Over Time</h2>
-          <select v-model="selectedTimeFrame" @change="updateRevenueChart">
-            <option value="day">Daily</option>
-            <option value="week">Weekly</option>
-            <option value="month">Monthly</option>
-          </select>
-          <canvas ref="revenueChart"></canvas>
-        </div>
+  <h2>📈 Revenue Growth Over Time</h2>
+  <select v-model="selectedTimeFrame" @change="updateRevenueChart" class="custom-select">
+    <option value="day">Daily</option>
+    <option value="week">Weekly</option>
+    <option value="month">Monthly</option>
+  </select>
+  <br>
+  <br>
+  <canvas ref="revenueChart"></canvas>
+</div>
+
       </div>
 
       <!-- User Management Section -->
       <section v-if="activeSection === 'users'" class="user-management">
         <div class="section-header">
-          <h2>User Management</h2>
+          <br>
+          <h3 class="header-title">User Management</h3>
+          <br>
           <button @click="toggleSection('users')" class="btn btn-more">
             {{ showMore.users ? 'Show Less' : 'Show More' }}
           </button>
         </div>
+        <br>
         <div class="table-responsive" :class="{ expanded: showMore.users }">
           <table v-if="users.length > 0" class="data-table">
             <thead>
@@ -168,11 +174,14 @@
       <!-- Comments Section -->
       <section v-if="activeSection === 'comments'" class="comments">
         <div class="section-header">
-          <h2>Comments</h2>
+          <br>
+          <h2 class="header-title">Feedback</h2>
+          <br>
           <button @click="toggleSection('comments')" class="btn btn-more">
             {{ showMore.comments ? 'Show Less' : 'Show More' }}
           </button>
         </div>
+        <br>
         <div class="table-responsive" :class="{ expanded: showMore.comments }">
           <table v-if="comments.length > 0" class="data-table">
             <thead>
@@ -197,11 +206,14 @@
       <!-- Requests Section -->
       <section v-if="activeSection === 'requests'" class="requests">
         <div class="section-header">
-          <h2>Requests</h2>
+          <br>
+          <h2 class="header-title">Series Requests</h2>
+          <br>
           <button @click="toggleSection('requests')" class="btn btn-more">
             {{ showMore.requests ? 'Show Less' : 'Show More' }}
           </button>
         </div>
+        <br>
         <div class="table-responsive" :class="{ expanded: showMore.requests }">
           <table v-if="requests.length > 0" class="data-table">
             <thead>
@@ -232,11 +244,14 @@
       <!-- Contact Submissions Section -->
       <section v-if="activeSection === 'contactSubmissions'" class="contact-submissions">
         <div class="section-header">
-          <h2>Contact Submissions</h2>
+          <br>
+          <h2 class="header-title">Contact Submissions</h2>  
+          <br>
           <button @click="toggleSection('contactSubmissions')" class="btn btn-more">
             {{ showMore.contactSubmissions ? 'Show Less' : 'Show More' }}
           </button>
         </div>
+        <br>
         <div class="table-responsive" :class="{ expanded: showMore.contactSubmissions }">
           <table v-if="contactSubmissions.length > 0" class="data-table">
             <thead>
@@ -266,11 +281,14 @@
       <!-- Payments Section -->
       <section v-if="activeSection === 'payments'" class="payments">
         <div class="section-header">
-          <h2>Payments</h2>
+          <br>
+          <h2 class="header-title">Payments</h2>
+          <br>
           <button @click="toggleSection('payments')" class="btn btn-more">
             {{ showMore.payments ? 'Show Less' : 'Show More' }}
           </button>
         </div>
+        <br>
         <div class="table-responsive" :class="{ expanded: showMore.payments }">
           <table v-if="payments.length > 0" class="data-table">
             <thead>
@@ -301,11 +319,14 @@
       <!-- Chat Messages Section -->
       <section v-if="activeSection === 'chatMessages'" class="chat-messages">
         <div class="section-header">
-          <h2>Chat Messages</h2>
+          <br>
+          <h2 class="header-title">Chat Messages</h2>
+          <br>
           <button @click="toggleSection('chatMessages')" class="btn btn-more">
             {{ showMore.chatMessages ? 'Show Less' : 'Show More' }}
           </button>
         </div>
+        <br>
         <div class="table-responsive" :class="{ expanded: showMore.chatMessages }">
           <table v-if="chatMessages.length > 0" class="data-table">
             <thead>
@@ -349,7 +370,7 @@ export default {
       menuItems: [
         { section: 'analytics', icon: '📊', label: 'Analytics' },
         { section: 'users', icon: '👥', label: 'User Management' },
-        { section: 'comments', icon: '💬', label: 'Comments' },
+        { section: 'comments', icon: '💬', label: 'Feedback' },
         { section: 'requests', icon: '📥', label: 'Requests' },
         { section: 'contactSubmissions', icon: '📨', label: 'Contact' },
         { section: 'payments', icon: '💳', label: 'Payments' },
@@ -688,6 +709,46 @@ export default {
   color: white;
 }
 
+
+
+  .header-title {
+  margin: 0; /* Remove default margin from h3 */
+  text-align: left; /* Ensure the title is aligned to the left */
+  font-size: 1.8rem; /* Adjust font size as needed */
+  color: #333; /* Customize text color */
+}
+
+
+.custom-select {
+  width: 200px; /* Adjust width as needed */
+  padding: 8px 12px;
+  font-size: 16px;
+  border: 2px solid #6c63ff; /* Add a colored border */
+  border-radius: 8px; /* Rounded corners */
+  background-color: #f9f9f9; /* Light background */
+  color: #333; /* Text color */
+  appearance: none; /* Removes default arrow styling */
+  outline: none; /* Removes outline on focus */
+  cursor: pointer;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.custom-select:hover {
+  border-color: #5848c2; /* Darker border on hover */
+}
+
+.custom-select:focus {
+  border-color: #5848c2;
+  box-shadow: 0 0 5px rgba(88, 72, 194, 0.5); /* Add focus effect */
+}
+
+.custom-select option {
+  padding: 8px; /* Add padding inside options */
+  background-color: #f9f9f9; /* Option background */
+  color: #333; /* Option text color */
+}
+
+
 /* Sticky Header */
 .sticky-header {
   display: flex;
@@ -743,6 +804,7 @@ export default {
 .btn-more {
   background-color: #3b82f6;
   color: white;
+  margin-right: auto;
 }
 
 .btn-more:hover {
@@ -803,6 +865,7 @@ export default {
   animation: spin 1s linear infinite;
 }
 
+
 @keyframes spin {
   0% {
     transform: rotate(0deg);
@@ -838,6 +901,7 @@ export default {
 }
 
 .analytics-group h2 {
+  text-align: start;
   font-size: 1.2rem;
   margin-bottom: 15px;
   color: #1f2937;
@@ -870,12 +934,14 @@ export default {
 
 .card-content h3 {
   margin: 0;
+  text-align: start;
   font-size: 14px;
   color: #6b7280;
 }
 
 .card-value {
   margin: 0;
+  text-align: center;
   font-size: 18px;
   font-weight: 600;
   color: #1f2937;
@@ -890,6 +956,7 @@ export default {
 }
 
 .revenue-graph h2 {
+  text-align: start ;
   margin-top: 0;
   margin-bottom: 20px;
   color: #1f2937;
@@ -1036,7 +1103,8 @@ export default {
   .section-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
   }
+  
+  
 }
 </style>
